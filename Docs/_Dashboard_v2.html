@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISS MicrobeRX · Microbial Diversity Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --premt:#3C3489;--mt1:#185FA5;--mt2:#B8650E;--mt3:#0F8A63;
+  --novel:#C94E20;--bsl2:#C93B3B;--bsl1:#4A8A1E;
+  --bg:#F5F3EE;--card:#FFFFFF;--border:#E2DED6;
+  --text:#1C1B18;--muted:#6B6860;--faint:#F0EDE7;
+  --sans:'Plus Jakarta Sans',sans-serif;
+  --serif:'Instrument Serif',serif;
+  --mono:'DM Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13px;min-height:100vh}
+.shell{display:grid;grid-template-columns:210px 1fr;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{background:#1A1916;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+.logo{padding:22px 18px 14px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.logo-t{font-family:var(--serif);font-size:16px;color:#F5F3EE;font-style:italic}
+.logo-s{font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:.1em;text-transform:uppercase;font-family:var(--mono);margin-top:4px}
+.nav{padding:10px 10px;flex:1}
+.ns{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.22);font-family:var(--mono);padding:14px 8px 5px}
+.ni{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:6px;cursor:pointer;color:rgba(255,255,255,0.45);font-size:12px;font-weight:500;transition:all .15s;margin-bottom:1px}
+.ni:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8)}
+.ni.active{background:rgba(255,255,255,0.1);color:#fff}
+.nd{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.nb{margin-left:auto;font-size:9px;font-family:var(--mono);color:rgba(255,255,255,0.25)}
+.sf{padding:12px 18px;border-top:1px solid rgba(255,255,255,0.07);font-size:9px;color:rgba(255,255,255,0.18);font-family:var(--mono);line-height:1.9}
+
+/* MAIN */
+.main{padding:26px 28px;overflow-x:hidden}
+.page{display:none}.page.active{display:block}
+.ph{margin-bottom:22px}
+.pe{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-family:var(--mono);margin-bottom:5px}
+.pt{font-family:var(--serif);font-size:24px;color:var(--text);font-style:italic;line-height:1.2}
+.pd{font-size:12px;color:var(--muted);margin-top:5px;max-width:580px}
+
+/* KPI */
+.krow{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:15px 17px;border-top:3px solid var(--c,#888)}
+.kn{font-family:var(--mono);font-size:24px;font-weight:500;color:var(--c,var(--text));line-height:1}
+.kl{font-size:11px;color:var(--muted);margin-top:5px}
+.ks{font-size:10px;color:var(--muted);margin-top:2px;opacity:.7}
+
+/* GRID */
+.g{display:grid;gap:14px;margin-bottom:14px}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:1fr 1fr 1fr}
+.cw{grid-template-columns:3fr 2fr}
+.cn{grid-template-columns:2fr 3fr}
+.cstack{display:flex;flex-direction:column;gap:14px}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+.ct{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;font-family:var(--mono)}
+.cn2{font-size:10px;color:var(--muted);margin-top:9px;font-style:italic}
+canvas{display:block;width:100%!important;max-width:100%}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:11px}
+.tbl th{font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);padding:6px 9px;text-align:left;font-family:var(--mono);font-weight:500}
+.tbl td{padding:6px 9px;border-bottom:1px solid var(--faint);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--faint)}
+.pill{display:inline-block;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:500;font-family:var(--mono)}
+
+/* FILTER */
+.fb{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.fl{font-size:10px;color:var(--muted);font-family:var(--mono)}
+.fbtn{padding:4px 12px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:11px;cursor:pointer;font-family:var(--sans);font-weight:500;transition:all .15s}
+.fbtn.active,.fbtn:hover{border-color:var(--mt3);color:var(--mt3);background:#F0FBF7}
+.fbtn.all.active{background:var(--text);color:#fff;border-color:var(--text)}
+
+/* TOOLTIP */
+#tip{position:fixed;background:#1A1916;color:#F5F3EE;padding:9px 12px;border-radius:7px;font-size:11px;pointer-events:none;display:none;z-index:9999;max-width:240px;line-height:1.7}
+#tip strong{color:#98F5D0}
+
+/* DOT LEGEND */
+.leg{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:11px}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.ld{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.ls{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+</style>
+</head>
+<body>
+<div id="tip"></div>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-t">ISS MicrobeRX</div>
+    <div class="logo-s">Microbial Diversity · 2025</div>
+  </div>
+  <nav class="nav">
+    <div class="ns">Dashboard</div>
+    <div class="ni active" onclick="go('p1',this)"><div class="nd" style="background:var(--premt)"></div>Overview<span class="nb">868</span></div>
+    <div class="ns">Section 1</div>
+    <div class="ni" onclick="go('p2',this)"><div class="nd" style="background:var(--mt1)"></div>Diversity<span class="nb">H'</span></div>
+    <div class="ni" onclick="go('p3',this)"><div class="nd" style="background:var(--mt2)"></div>Species Profile<span class="nb">Top 15</span></div>
+    <div class="ns">Section 2</div>
+    <div class="ni" onclick="go('p4',this)"><div class="nd" style="background:var(--novel)"></div>Novel Species<span class="nb">17</span></div>
+    <div class="ns">Quality</div>
+    <div class="ni" onclick="go('p5',this)"><div class="nd" style="background:var(--bsl1)"></div>Genome QC<span class="nb">QC</span></div>
+  </nav>
+  <div class="sf">Pre-MT: 282 strains<br>MT-3: 268 strains<br>Study dataset: 550<br>Novel genera: 9</div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- PAGE 1: OVERVIEW -->
+<div class="page active" id="p1">
+  <div class="ph"><div class="pe">Section 1 · Dataset</div><div class="pt">Dataset Overview &amp; Study Scope</div><div class="pd">868 ISS bacterial isolates across 4 mission phases. Primary study dataset: Pre-MT + MT-3 (n=550). MT-1 and MT-2 retained for comparative context.</div></div>
+  <div class="krow">
+    <div class="kpi" style="--c:var(--premt)"><div class="kn">868</div><div class="kl">Total ISS genomes</div><div class="ks">All 4 mission phases</div></div>
+    <div class="kpi" style="--c:var(--mt3)"><div class="kn">550</div><div class="kl">Study dataset</div><div class="ks">Pre-MT + MT-3 (after QC)</div></div>
+    <div class="kpi" style="--c:var(--novel)"><div class="kn">17</div><div class="kl">Novel species</div><div class="ks">Across 9 genera</div></div>
+    <div class="kpi" style="--c:#888"><div class="kn">59</div><div class="kl">Failed QC</div><div class="ks">Low completeness / contamination</div></div>
+  </div>
+  <div class="g c2">
+    <div class="card">
+      <div class="ct">Strain count by mission level</div>
+      <div class="leg">
+        <div class="li"><div class="ld" style="background:var(--premt)"></div>Pre-MT (283)</div>
+        <div class="li"><div class="ld" style="background:var(--mt1)"></div>MT-1 (231)</div>
+        <div class="li"><div class="ld" style="background:var(--mt2)"></div>MT-2 (86)</div>
+        <div class="li"><div class="ld" style="background:var(--mt3)"></div>MT-3 (268)</div>
+      </div>
+      <div style="height:200px"><canvas id="c-donut"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">Phylum composition — Pre-MT &amp; MT-3</div>
+      <div class="leg">
+        <div class="li"><div class="ls" style="background:var(--premt)"></div>Pre-MT</div>
+        <div class="li"><div class="ls" style="background:var(--mt3)"></div>MT-3</div>
+      </div>
+      <div style="height:200px"><canvas id="c-phylum"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Mission-level dataset summary</div>
+    <table class="tbl">
+      <thead><tr><th>Mission</th><th>Strains (N)</th><th>Species (S)</th><th>Shannon H'</th><th>Evenness J'</th><th>Role in study</th></tr></thead>
+      <tbody>
+        <tr><td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--premt);margin-right:7px;vertical-align:middle"></span>Pre-MT</td><td>283</td><td>43</td><td>2.633</td><td>0.700</td><td><span class="pill" style="background:#EEF2FF;color:#3730A3">Study dataset</span></td></tr>
+        <tr><td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--mt1);margin-right:7px;vertical-align:middle"></span>MT-1</td><td>231</td><td>30</td><td>2.888</td><td>0.849</td><td><span class="pill" style="background:#F5F5F5;color:#888">Reference</span></td></tr>
+        <tr><td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--mt2);margin-right:7px;vertical-align:middle"></span>MT-2</td><td>86</td><td>11</td><td>1.608</td><td>0.671</td><td><span class="pill" style="background:#F5F5F5;color:#888">Reference</span></td></tr>
+        <tr><td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--mt3);margin-right:7px;vertical-align:middle"></span>MT-3</td><td>268</td><td>25</td><td>2.315</td><td>0.719</td><td><span class="pill" style="background:#EEF2FF;color:#3730A3">Study dataset</span></td></tr>
+        <tr style="font-weight:600"><td>Total</td><td>868</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PAGE 2: DIVERSITY -->
+<div class="page" id="p2">
+  <div class="ph"><div class="pe">Section 1 · Diversity</div><div class="pt">Microbial Diversity Across Mission Phases</div><div class="pd">Shannon diversity index, species richness, and evenness. MT-2 shows a selective bottleneck; MT-3 shows partial recovery toward MT-1 levels.</div></div>
+  <div class="krow">
+    <div class="kpi" style="--c:var(--premt)"><div class="kn">2.633</div><div class="kl">Pre-MT · H'</div><div class="ks">S=43 · J'=0.700 · N=283</div></div>
+    <div class="kpi" style="--c:var(--mt1)"><div class="kn">2.888 ↑</div><div class="kl">MT-1 · H' (highest)</div><div class="ks">S=30 · J'=0.849 · N=231</div></div>
+    <div class="kpi" style="--c:var(--mt2)"><div class="kn">1.608 ↓</div><div class="kl">MT-2 · H' (bottleneck)</div><div class="ks">S=11 · J'=0.671 · N=86</div></div>
+    <div class="kpi" style="--c:var(--mt3)"><div class="kn">2.315</div><div class="kl">MT-3 · H' (recovery)</div><div class="ks">S=25 · J'=0.719 · N=268</div></div>
+  </div>
+  <div class="g c2">
+    <div class="card">
+      <div class="ct">Shannon index (H') &amp; Species richness (S) by mission</div>
+      <div class="leg">
+        <div class="li"><div class="ls" style="background:var(--premt)"></div>Pre-MT</div>
+        <div class="li"><div class="ls" style="background:var(--mt1)"></div>MT-1</div>
+        <div class="li"><div class="ls" style="background:var(--mt2)"></div>MT-2</div>
+        <div class="li"><div class="ls" style="background:var(--mt3)"></div>MT-3</div>
+        <div class="li"><div class="ld" style="background:var(--novel)"></div>Richness S (line)</div>
+      </div>
+      <div style="height:220px"><canvas id="c-shannon"></canvas></div>
+      <div class="cn2">Left Y: Shannon H' · Right Y: Species richness S. MT-2 bottleneck clearly visible.</div>
+    </div>
+    <div class="card">
+      <div class="ct">Pielou evenness (J') by mission</div>
+      <div style="height:270px"><canvas id="c-evenness"></canvas></div>
+      <div class="cn2">Dashed line at J'=0.75. MT-1 shows highest evenness (most balanced community).</div>
+    </div>
+  </div>
+  <div class="g c2">
+    <div class="card">
+      <div class="ct">Species intersections across mission phases (UpSet summary)</div>
+      <div style="height:260px"><canvas id="c-upset"></canvas></div>
+      <div class="cn2">Only 1 species shared across all 4 phases: <em>S. saprophyticus</em> — stable core microbiome.</div>
+    </div>
+    <div class="card">
+      <div class="ct">Phase-exclusive vs shared species</div>
+      <div style="height:260px"><canvas id="c-unique"></canvas></div>
+      <div class="cn2">High phase-exclusivity across all missions indicates temporal succession rather than a static community.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: SPECIES -->
+<div class="page" id="p3">
+  <div class="ph"><div class="pe">Section 1 · Species Profile</div><div class="pt">Dominant Species &amp; Pathogen Profile</div><div class="pd">Staphylococcus dominates across all mission phases. Filter by mission to explore community composition shifts.</div></div>
+  <div class="fb">
+    <span class="fl">Filter:</span>
+    <button class="fbtn all active" onclick="filterSp('ALL',this)">All missions</button>
+    <button class="fbtn" onclick="filterSp('Pre-MT',this)">Pre-MT</button>
+    <button class="fbtn" onclick="filterSp('MT-1',this)">MT-1</button>
+    <button class="fbtn" onclick="filterSp('MT-2',this)">MT-2</button>
+    <button class="fbtn" onclick="filterSp('MT-3',this)">MT-3</button>
+  </div>
+  <div class="g cw">
+    <div class="card">
+      <div class="ct">Top 15 species — strain count stacked by mission level</div>
+      <div class="leg" id="sp-leg">
+        <div class="li"><div class="ls" style="background:var(--premt)"></div>Pre-MT</div>
+        <div class="li"><div class="ls" style="background:var(--mt1)"></div>MT-1</div>
+        <div class="li"><div class="ls" style="background:var(--mt2)"></div>MT-2</div>
+        <div class="li"><div class="ls" style="background:var(--mt3)"></div>MT-3</div>
+      </div>
+      <div style="height:420px"><canvas id="c-species"></canvas></div>
+    </div>
+    <div class="cstack">
+      <div class="card">
+        <div class="ct">BSL risk profile</div>
+        <div style="height:150px"><canvas id="c-bsl"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="ct">Staphylococcus dominance</div>
+        <table class="tbl"><tbody id="staph-tb"></tbody></table>
+      </div>
+      <div class="card">
+        <div class="ct">Pathogen categories</div>
+        <div style="height:140px"><canvas id="c-path"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4: NOVEL -->
+<div class="page" id="p4">
+  <div class="ph"><div class="pe">Section 2 · Novel Species</div><div class="pt">Novel Species Identification</div><div class="pd">17 putative novel strains across 9 genera. All exhibit ANI &lt;95.5% vs closest type strain — below the established species boundary. Hover scatter points for details.</div></div>
+  <div class="krow">
+    <div class="kpi" style="--c:var(--novel)"><div class="kn">17</div><div class="kl">Novel strains</div><div class="ks">ANI &lt;95.5% to type strain</div></div>
+    <div class="kpi" style="--c:var(--novel)"><div class="kn">9</div><div class="kl">Genera affected</div><div class="ks">Ralstonia, Staph, Kocuria…</div></div>
+    <div class="kpi" style="--c:var(--novel)"><div class="kn">78.2%</div><div class="kl">Lowest ANI</div><div class="ks">Sphingomonas lutea</div></div>
+    <div class="kpi" style="--c:var(--novel)"><div class="kn">8</div><div class="kl">Ralstonia clade</div><div class="ks">Largest novel species group</div></div>
+  </div>
+  <div class="g cn">
+    <div class="card">
+      <div class="ct">ANI (%) vs 16S rRNA similarity — core evidence</div>
+      <div id="novel-legend" class="leg" style="margin-bottom:8px"></div>
+      <div style="height:280px;position:relative"><canvas id="c-ani"></canvas></div>
+      <div class="cn2">Bottom-right quadrant: high 16S but ANI below species boundary — novel despite identical marker genes. <strong>Hover points</strong> for strain info.</div>
+    </div>
+    <div class="cstack">
+      <div class="card">
+        <div class="ct">Novel strains per genus</div>
+        <div style="height:190px"><canvas id="c-ngenus"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="ct">Minimum ANI per genus (%)</div>
+        <div style="height:120px"><canvas id="c-anirange"></canvas></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Full novel strain evidence table</div>
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>Strain ID</th><th>Genus</th><th>Closest type strain</th><th>ANI (%)</th><th>AAI (%)</th><th>PoCP (%)</th><th>16S Sim (%)</th><th>Status</th></tr></thead>
+        <tbody id="novel-tb"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5: QC -->
+<div class="page" id="p5">
+  <div class="ph"><div class="pe">Genome Quality Control</div><div class="pt">Genome Quality Assessment</div><div class="pd">Assembly quality metrics for all study genomes. Completeness, contamination, N50 by mission phase.</div></div>
+  <div class="krow">
+    <div class="kpi" style="--c:var(--mt3)"><div class="kn">99.9%</div><div class="kl">Median completeness</div><div class="ks">CheckM assessment</div></div>
+    <div class="kpi" style="--c:var(--mt3)"><div class="kn">0.15%</div><div class="kl">Median contamination</div><div class="ks">Well below 5% threshold</div></div>
+    <div class="kpi" style="--c:#888"><div class="kn">59</div><div class="kl">Genomes removed</div><div class="ks">Low quality / contaminated</div></div>
+    <div class="kpi" style="--c:var(--mt3)"><div class="kn">809</div><div class="kl">Final dataset</div><div class="ks">868 − 59 (QC pass)</div></div>
+  </div>
+  <div class="g c2">
+    <div class="card">
+      <div class="ct">Completeness vs contamination — study genomes</div>
+      <div class="leg">
+        <div class="li"><div class="ld" style="background:var(--premt)"></div>Pre-MT passed</div>
+        <div class="li"><div class="ld" style="background:var(--mt3)"></div>MT-3 passed</div>
+        <div class="li"><div class="ld" style="background:var(--bsl2)"></div>Failed QC</div>
+      </div>
+      <div style="height:260px"><canvas id="c-qcsc"></canvas></div>
+      <div class="cn2">Green shaded region = QC pass zone (completeness &gt;90%, contamination &lt;5%). Hover for genome details.</div>
+    </div>
+    <div class="card">
+      <div class="ct">Completeness distribution by mission</div>
+      <div class="leg">
+        <div class="li"><div class="ls" style="background:var(--premt)"></div>Pre-MT</div>
+        <div class="li"><div class="ls" style="background:var(--mt1)"></div>MT-1</div>
+        <div class="li"><div class="ls" style="background:var(--mt2)"></div>MT-2</div>
+        <div class="li"><div class="ls" style="background:var(--mt3)"></div>MT-3</div>
+      </div>
+      <div style="height:260px"><canvas id="c-comp"></canvas></div>
+    </div>
+  </div>
+  <div class="g c2">
+    <div class="card">
+      <div class="ct">Mean N50 by mission (assembly contiguity)</div>
+      <div style="height:200px"><canvas id="c-n50"></canvas></div>
+      <div class="cn2">Higher N50 = more contiguous assembly.</div>
+    </div>
+    <div class="card">
+      <div class="ct">QC pass vs removed by mission</div>
+      <div style="height:200px"><canvas id="c-qcbar"></canvas></div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- Load Chart.js ONLY — no external annotation plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// ── DATA ─────────────────────────────────────────────────────────
+const SP=[
+  {o:"Staphylococcus hominis",m:"Pre-MT",c:60,t:102,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
+  {o:"Staphylococcus hominis",m:"MT-1",c:18,t:102,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
+  {o:"Staphylococcus hominis",m:"MT-3",c:24,t:102,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
+  {o:"Staphylococcus epidermidis",m:"Pre-MT",c:70,t:99,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
+  {o:"Staphylococcus epidermidis",m:"MT-1",c:24,t:99,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
+  {o:"Staphylococcus epidermidis",m:"MT-3",c:5,t:99,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
+  {o:"Staphylococcus saprophyticus",m:"Pre-MT",c:7,t:85,p:"Opportunistic pathogen",b:"BSL-2"},
+  {o:"Staphylococcus saprophyticus",m:"MT-1",c:21,t:85,p:"Opportunistic pathogen",b:"BSL-2"},
+  {o:"Staphylococcus saprophyticus",m:"MT-2",c:8,t:85,p:"Opportunistic pathogen",b:"BSL-2"},
+  {o:"Staphylococcus saprophyticus",m:"MT-3",c:49,t:85,p:"Opportunistic pathogen",b:"BSL-2"},
+  {o:"Staphylococcus cohnii",m:"Pre-MT",c:6,t:71,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
+  {o:"Staphylococcus cohnii",m:"MT-3",c:65,t:71,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
+  {o:"Pseudomonas fulva",m:"MT-2",c:43,t:43,p:"Opportunistic pathogen (rare)",b:"BSL-2"},
+  {o:"Micrococcus aloeverae",m:"MT-3",c:40,t:40,p:"Non-pathogenic / Environmental",b:"BSL-1"},
+  {o:"Pantoea piersonii",m:"MT-1",c:7,t:34,p:"Non-pathogenic / Environmental",b:"BSL-1"},
+  {o:"Pantoea piersonii",m:"MT-3",c:27,t:34,p:"Non-pathogenic / Environmental",b:"BSL-1"},
+  {o:"Staphylococcus aureus",m:"MT-1",c:34,t:34,p:"Major pathogen / Opportunistic",b:"BSL-2"},
+  {o:"Ralstonia pickettii",m:"Pre-MT",c:32,t:32,p:"Opportunistic pathogen",b:"BSL-2"},
+  {o:"Staphylococcus capitis",m:"Pre-MT",c:25,t:31,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
+  {o:"Staphylococcus capitis",m:"MT-1",c:6,t:31,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
+  {o:"Enterococcus faecalis",m:"Pre-MT",c:1,t:23,p:"Opportunistic pathogen",b:"BSL-2"},
+  {o:"Enterococcus faecalis",m:"MT-1",c:15,t:23,p:"Opportunistic pathogen",b:"BSL-2"},
+  {o:"Enterococcus faecalis",m:"MT-3",c:7,t:23,p:"Opportunistic pathogen",b:"BSL-2"},
+  {o:"Acinetobacter pittii",m:"MT-1",c:5,t:20,p:"Opportunistic pathogen",b:"BSL-2"},
+  {o:"Acinetobacter pittii",m:"MT-2",c:15,t:20,p:"Opportunistic pathogen",b:"BSL-2"},
+  {o:"Micrococcus yunnanensis",m:"Pre-MT",c:2,t:18,p:"Non-pathogenic / Environmental",b:"BSL-1"},
+  {o:"Micrococcus yunnanensis",m:"MT-3",c:16,t:18,p:"Non-pathogenic / Environmental",b:"BSL-1"},
+  {o:"Pantoea brenneri",m:"MT-1",c:18,t:18,p:"Opportunistic pathogen",b:"BSL-2"},
+  {o:"Enterobacter bugandensis",m:"MT-1",c:15,t:15,p:"Opportunistic pathogen",b:"BSL-2"}
+];
+
+const NOV=[
+  {id:"F9_3S_D5_B_2",name:"Sphingomonas lutea",genus:"Sphingomonas",ref:"Sphingomicrobium astaxanthinifaciens",ani:78.2,aai:61.17,pocp:58.66,s16:98.599},
+  {id:"153480035-1",name:"Methylorubrum extorquens",genus:"Methylorubrum",ref:"Methylobacterium organophilum",ani:83.13,aai:75.88,pocp:71.06,s16:100.0},
+  {id:"111540051-3",name:"Kocuria rhizophila",genus:"Kocuria",ref:"Kocuria rhizophila",ani:89.8,aai:88.03,pocp:86.33,s16:99.645},
+  {id:"153480033-6",name:"Staphylococcus hominis",genus:"Staphylococcus",ref:"S. hominis subsp. novobiosepticus",ani:92.32,aai:93.72,pocp:90.55,s16:99.905},
+  {id:"151470009-6",name:"Streptococcus sp.",genus:"Streptococcus",ref:"Streptococcus jiangnanensis",ani:92.42,aai:94.55,pocp:85.64,s16:99.536},
+  {id:"110740021-2",name:"Rothia mucilaginosa",genus:"Rothia",ref:"Rothia mucilaginosa ATCC 25296",ani:92.82,aai:93.78,pocp:91.74,s16:99.25},
+  {id:"121560039-2",name:"Ralstonia insidiosa",genus:"Ralstonia",ref:"Ralstonia insidiosa AU2944",ani:94.08,aai:94.79,pocp:80.64,s16:99.721},
+  {id:"151470066-1",name:"Ralstonia insidiosa",genus:"Ralstonia",ref:"Ralstonia insidiosa AU2944",ani:94.10,aai:94.78,pocp:82.02,s16:99.721},
+  {id:"142550021-1",name:"Ralstonia insidiosa",genus:"Ralstonia",ref:"Ralstonia insidiosa AU2944",ani:94.11,aai:94.78,pocp:82.03,s16:99.721},
+  {id:"151470044-1",name:"Ralstonia insidiosa",genus:"Ralstonia",ref:"Ralstonia insidiosa AU2944",ani:94.12,aai:94.78,pocp:82.04,s16:99.721},
+  {id:"142550027-2",name:"Ralstonia insidiosa",genus:"Ralstonia",ref:"Ralstonia insidiosa AU2944",ani:94.13,aai:94.78,pocp:82.04,s16:99.721},
+  {id:"130770013-1",name:"Ralstonia insidiosa",genus:"Ralstonia",ref:"Ralstonia insidiosa AU2944",ani:94.13,aai:94.79,pocp:82.03,s16:99.721},
+  {id:"151470066-2",name:"Ralstonia insidiosa",genus:"Ralstonia",ref:"Ralstonia insidiosa AU2944",ani:94.13,aai:94.78,pocp:82.03,s16:99.721},
+  {id:"123250053-1",name:"Ralstonia insidiosa",genus:"Ralstonia",ref:"Ralstonia insidiosa AU2944",ani:94.18,aai:94.93,pocp:82.16,s16:99.721},
+  {id:"121210007-3",name:"Staphylococcus warneri",genus:"Staphylococcus",ref:"Staphylococcus warneri",ani:94.15,aai:96.42,pocp:92.53,s16:99.84},
+  {id:"140720001-1",name:"Staphylococcus warneri",genus:"Staphylococcus",ref:"Staphylococcus warneri",ani:94.18,aai:96.27,pocp:91.95,s16:null},
+  {id:"F10_7S_D2_EB4",name:"Kocuria marina",genus:"Kocuria",ref:"Kocuria marina KMM 3905",ani:94.54,aai:94.55,pocp:86.15,s16:99.792}
+];
+
+const QC=[
+  {a:"GCA_053621075.1",m:"Pre-MT",comp:99.99,cont:0.19,n50:691837,st:"Passed"},
+  {a:"GCA_053620935.1",m:"Pre-MT",comp:99.99,cont:0.21,n50:154316,st:"Passed"},
+  {a:"GCA_053620915.1",m:"Pre-MT",comp:99.96,cont:0.03,n50:185440,st:"Passed"},
+  {a:"GCA_053625755.1",m:"Pre-MT",comp:100.0,cont:0.05,n50:447205,st:"Passed"},
+  {a:"GCA_053624715.1",m:"Pre-MT",comp:99.98,cont:0.10,n50:449424,st:"Passed"},
+  {a:"GCA_053624195.1",m:"Pre-MT",comp:99.99,cont:0.01,n50:470751,st:"Passed"},
+  {a:"GCA_053623225.1",m:"Pre-MT",comp:100.0,cont:0.05,n50:422357,st:"Passed"},
+  {a:"GCA_053621095.1",m:"Pre-MT",comp:100.0,cont:0.06,n50:539715,st:"Passed"},
+  {a:"GCA_053626615.1",m:"Pre-MT",comp:100.0,cont:0.05,n50:422278,st:"Passed"},
+  {a:"GCA_053623715.1",m:"Pre-MT",comp:99.98,cont:0.09,n50:87192,st:"Failed"},
+  {a:"GCA_053620545.1",m:"Pre-MT",comp:99.98,cont:0.02,n50:80372,st:"Failed"},
+  {a:"GCA_053628335.1",m:"Pre-MT",comp:99.98,cont:0.09,n50:97013,st:"Failed"},
+  {a:"GCA_013366635.2",m:"MT-1",comp:100.0,cont:0.07,n50:5234636,st:"Passed"},
+  {a:"GCA_014266175.1",m:"MT-1",comp:99.99,cont:0.07,n50:717072,st:"Passed"},
+  {a:"GCA_014266185.1",m:"MT-1",comp:99.99,cont:0.07,n50:717159,st:"Passed"},
+  {a:"GCA_002890755.1",m:"MT-1",comp:100.0,cont:0.04,n50:4768375,st:"Passed"},
+  {a:"GCA_001743125.1",m:"MT-1",comp:100.0,cont:0.30,n50:295897,st:"Passed"},
+  {a:"GCA_017167925.1",m:"MT-2",comp:100.0,cont:0.48,n50:73806,st:"Passed"},
+  {a:"GCA_017167545.1",m:"MT-2",comp:99.99,cont:0.17,n50:245667,st:"Passed"},
+  {a:"GCA_017167825.1",m:"MT-2",comp:99.99,cont:0.18,n50:191163,st:"Passed"},
+  {a:"GCA_053624215.1",m:"MT-3",comp:100.0,cont:0.12,n50:227538,st:"Passed"},
+  {a:"GCA_053627495.1",m:"MT-3",comp:100.0,cont:0.00,n50:132798,st:"Passed"},
+  {a:"GCA_053624795.1",m:"MT-3",comp:100.0,cont:0.01,n50:401578,st:"Passed"},
+  {a:"GCA_053626815.1",m:"MT-3",comp:100.0,cont:0.79,n50:478540,st:"Passed"}
+];
+
+// ── COLOR MAP ─────────────────────────────────────────────────────
+const MC={"Pre-MT":"#3C3489","MT-1":"#185FA5","MT-2":"#B8650E","MT-3":"#0F8A63"};
+const GC={"Sphingomonas":"#7B3F9E","Methylorubrum":"#1A6B8A","Kocuria":"#2E7D32","Staphylococcus":"#B8650E","Streptococcus":"#1565C0","Rothia":"#6D4C41","Ralstonia":"#C94E20"};
+const gc=g=>GC[g]||"#888";
+const mc=m=>MC[m]||"#888";
+const MISSIONS=["Pre-MT","MT-1","MT-2","MT-3"];
+
+// ── CHART DEFAULTS ────────────────────────────────────────────────
+const DEFS={responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{display:false},tooltip:{backgroundColor:"#1A1916",titleFont:{family:"DM Mono",size:11},bodyFont:{family:"Plus Jakarta Sans",size:11},padding:9,cornerRadius:6}},
+  scales:{
+    x:{grid:{color:"#F0EDE7",lineWidth:0.8},ticks:{font:{family:"DM Mono",size:10},color:"#6B6860"}},
+    y:{grid:{color:"#F0EDE7",lineWidth:0.8},ticks:{font:{family:"DM Mono",size:10},color:"#6B6860"}}
+  }
+};
+
+function mk(id,type,data,opts){
+  const el=document.getElementById(id);
+  if(!el)return null;
+  return new Chart(el,{type,data,options:{...JSON.parse(JSON.stringify(DEFS)),...opts}});
+}
+function merge(a,b){return Object.assign(JSON.parse(JSON.stringify(a)),b)}
+
+// ── PAGE 1 ────────────────────────────────────────────────────────
+mk("c-donut","doughnut",{
+  labels:["Pre-MT (283)","MT-1 (231)","MT-2 (86)","MT-3 (268)"],
+  datasets:[{data:[283,231,86,268],backgroundColor:["#3C3489","#185FA5","#B8650E","#0F8A63"],borderWidth:3,borderColor:"#fff",hoverOffset:4}]
+},{
+  plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>" "+c.label+": "+c.parsed+" strains"}}},
+  cutout:"60%",
+  scales:{x:{display:false},y:{display:false}}
+});
+
+mk("c-phylum","bar",{
+  labels:["Bacillota","Pseudomonadota","Actinomycetota"],
+  datasets:[
+    {label:"Pre-MT",data:[200,71,11],backgroundColor:"#3C3489",borderRadius:4,barPercentage:0.4,categoryPercentage:0.7},
+    {label:"MT-3",data:[166,29,73],backgroundColor:"#0F8A63",borderRadius:4,barPercentage:0.4,categoryPercentage:0.7}
+  ]
+},{
+  plugins:{legend:{display:false}},
+  scales:{
+    x:{grid:{display:false},ticks:{font:{family:"DM Mono",size:11}}},
+    y:{grid:{color:"#F0EDE7"}}
+  }
+});
+
+// ── PAGE 2 ────────────────────────────────────────────────────────
+mk("c-shannon","bar",{
+  labels:["Pre-MT","MT-1","MT-2","MT-3"],
+  datasets:[
+    {type:"bar",label:"Shannon H'",data:[2.633,2.888,1.608,2.315],backgroundColor:MISSIONS.map(mc),borderRadius:5,yAxisID:"y",order:2},
+    {type:"line",label:"Richness S",data:[43,30,11,25],borderColor:"#C94E20",backgroundColor:"rgba(201,78,32,0.08)",pointBackgroundColor:"#C94E20",pointRadius:5,pointHoverRadius:7,tension:0.3,yAxisID:"y1",order:1}
+  ]
+},{
+  plugins:{legend:{display:false},tooltip:{mode:"index",intersect:false}},
+  scales:{
+    x:{grid:{display:false}},
+    y:{title:{display:true,text:"Shannon H'",font:{family:"DM Mono",size:10},color:"#6B6860"},min:0,max:3.5},
+    y1:{position:"right",title:{display:true,text:"Richness S",font:{family:"DM Mono",size:10},color:"#C94E20"},min:0,max:55,grid:{display:false},ticks:{color:"#C94E20",font:{family:"DM Mono",size:10}}}
+  }
+});
+
+// Evenness — draw reference line via plugin
+const evennessPlugin={id:"refLine",afterDraw(chart){
+  const{ctx,chartArea:{left,right,top,bottom},scales:{y}}=chart;
+  if(!y)return;
+  const yVal=0.75,yPx=y.getPixelForValue(yVal);
+  ctx.save();ctx.beginPath();ctx.setLineDash([5,4]);
+  ctx.strokeStyle="rgba(185,100,14,0.6)";ctx.lineWidth=1.5;
+  ctx.moveTo(left,yPx);ctx.lineTo(right,yPx);ctx.stroke();
+  ctx.font="9px DM Mono";ctx.fillStyle="#B8650E";
+  ctx.fillText("J'=0.75 reference",left+4,yPx-5);
+  ctx.restore();
+}};
+
+new Chart(document.getElementById("c-evenness"),{
+  type:"bar",
+  data:{
+    labels:["Pre-MT","MT-1","MT-2","MT-3"],
+    datasets:[{label:"Evenness J'",data:[0.700,0.849,0.671,0.719],backgroundColor:MISSIONS.map(mc),borderRadius:5}]
+  },
+  options:{...JSON.parse(JSON.stringify(DEFS)),scales:{x:{grid:{display:false}},y:{min:0,max:1,grid:{color:"#F0EDE7"},ticks:{font:{family:"DM Mono",size:10}}}}},
+  plugins:[evennessPlugin]
+});
+
+mk("c-upset","bar",{
+  labels:["Pre-MT only","MT-1 only","MT-2 only","MT-3 only","Pre-MT∩MT-1","Pre-MT∩MT-2","Pre-MT∩MT-3","MT-1∩MT-2","MT-1∩MT-3","MT-2∩MT-3","Pre-MT∩MT-1∩MT-2","Pre-MT∩MT-1∩MT-3","All 4 phases"],
+  datasets:[{
+    data:[25,17,4,11,4,1,4,1,1,3,1,5,1],
+    backgroundColor:["#3C3489","#185FA5","#B8650E","#0F8A63","#7B88CC","#9B7040","#4E9E7A","#888","#4E82A0","#8A7A4E","#aaa","#5A8A6A","#C94E20"],
+    borderRadius:3
+  }]
+},{
+  indexAxis:"y",
+  plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>" "+c.parsed.x+" species"}}},
+  scales:{
+    x:{grid:{color:"#F0EDE7"},ticks:{font:{family:"DM Mono",size:9}}},
+    y:{ticks:{font:{family:"DM Mono",size:9}}}
+  }
+});
+
+mk("c-unique","bar",{
+  labels:["Pre-MT","MT-1","MT-2","MT-3"],
+  datasets:[
+    {label:"Phase-exclusive",data:[25,17,4,11],backgroundColor:MISSIONS.map(mc),borderRadius:4},
+    {label:"Shared w/ others",data:[18,13,7,14],backgroundColor:MISSIONS.map(m=>mc(m)+"66"),borderRadius:4}
+  ]
+},{
+  plugins:{legend:{display:true,position:"bottom",labels:{font:{family:"Plus Jakarta Sans",size:11},padding:10,boxWidth:10,usePointStyle:true,pointStyle:"rect"}}},
+  scales:{x:{grid:{display:false}},y:{grid:{color:"#F0EDE7"}}}
+});
+
+// ── PAGE 3 ────────────────────────────────────────────────────────
+let spChart=null;
+
+function buildSpData(filter){
+  const totals={};
+  SP.forEach(d=>{totals[d.o]=(totals[d.o]||0)+d.c;});
+  const top15=Object.entries(totals).sort((a,b)=>b[1]-a[1]).slice(0,15).map(([o])=>o);
+  const missions=filter==="ALL"?MISSIONS:[filter];
+  const byM={};
+  SP.forEach(d=>{if(!byM[d.m])byM[d.m]={};byM[d.m][d.o]=(byM[d.m][d.o]||0)+d.c;});
+  return{
+    labels:top15.map(s=>s.length>24?s.slice(0,23)+"…":s),
+    datasets:missions.map(m=>({
+      label:m,
+      data:top15.map(o=>byM[m]?byM[m][o]||0:0),
+      backgroundColor:mc(m),
+      borderRadius:2,
+      stack:"s"
+    }))
+  };
+}
+
+function filterSp(f,btn){
+  document.querySelectorAll("#p3 .fbtn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  const d=buildSpData(f);
+  spChart.data.labels=d.labels;
+  spChart.data.datasets=d.datasets;
+  spChart.update();
+}
+
+function initP3(){
+  if(spChart)return;
+  spChart=new Chart(document.getElementById("c-species"),{
+    type:"bar",
+    data:buildSpData("ALL"),
+    options:{...JSON.parse(JSON.stringify(DEFS)),
+      indexAxis:"y",
+      plugins:{legend:{display:true,position:"bottom",labels:{font:{family:"Plus Jakarta Sans",size:11},padding:10,boxWidth:10,usePointStyle:true,pointStyle:"rect"}}},
+      scales:{
+        x:{stacked:true,grid:{color:"#F0EDE7"},ticks:{font:{family:"DM Mono",size:10}}},
+        y:{stacked:true,ticks:{font:{family:"DM Mono",size:10}}}
+      }
+    }
+  });
+
+  // BSL donut
+  let b1=0,b2=0;const seen=new Set();
+  SP.forEach(d=>{if(!seen.has(d.o)){seen.add(d.o);if(d.b==="BSL-1")b1+=d.t;else b2+=d.t;}});
+  mk("c-bsl","doughnut",{
+    labels:[`BSL-1 Environmental (${b1})`,`BSL-2 Pathogen (${b2})`],
+    datasets:[{data:[b1,b2],backgroundColor:["#4A8A1E","#C93B3B"],borderWidth:3,borderColor:"#fff"}]
+  },{
+    cutout:"55%",
+    plugins:{legend:{display:true,position:"bottom",labels:{font:{family:"Plus Jakarta Sans",size:10},padding:8,boxWidth:9,usePointStyle:true,pointStyle:"circle"}}},
+    scales:{x:{display:false},y:{display:false}}
+  });
+
+  // Staph summary
+  const stSp=[...new Set(SP.filter(d=>d.o.includes("Staphylococcus")).map(d=>d.o))];
+  const stTotal=SP.filter(d=>d.o.includes("Staphylococcus")).reduce((s,d)=>s+d.c,0);
+  document.getElementById("staph-tb").innerHTML=
+    `<tr><td style="color:var(--muted)">Total Staph strains</td><td style="font-weight:600;font-family:var(--mono)">${stTotal}</td></tr>
+     <tr><td style="color:var(--muted)">% of all isolates</td><td style="font-weight:600;font-family:var(--mono)">${(stTotal/868*100).toFixed(1)}%</td></tr>
+     <tr><td style="color:var(--muted)">Staph species</td><td style="font-weight:600;font-family:var(--mono)">${stSp.length}</td></tr>
+     <tr><td style="color:var(--muted)">Dominant</td><td style="font-size:10px;font-style:italic">S. hominis (102)</td></tr>`;
+
+  // Pathogen categories
+  const cats={};const orgS=new Set();
+  SP.forEach(d=>{if(!orgS.has(d.o)){orgS.add(d.o);const c=d.p||"Unknown";cats[c]=(cats[c]||0)+d.t;}});
+  const cl=Object.keys(cats);
+  mk("c-path","bar",{
+    labels:cl.map(l=>l.length>22?l.slice(0,21)+"…":l),
+    datasets:[{data:cl.map(l=>cats[l]),backgroundColor:cl.map(l=>l.includes("Major")?"#C93B3B":l.includes("Non-path")||l.includes("Environ")?"#4A8A1E":"#B8650E"),borderRadius:3}]
+  },{
+    indexAxis:"y",
+    plugins:{legend:{display:false}},
+    scales:{x:{grid:{color:"#F0EDE7"},ticks:{font:{family:"DM Mono",size:9}}},y:{ticks:{font:{family:"DM Mono",size:9}}}}
+  });
+}
+
+// ── PAGE 4 ────────────────────────────────────────────────────────
+function initP4(){
+  // Genus color legend
+  const genera=[...new Set(NOV.map(d=>d.genus))];
+  document.getElementById("novel-legend").innerHTML=genera.map(g=>`<div class="li"><div class="ld" style="background:${gc(g)}"></div>${g}</div>`).join("");
+
+  // Scatter
+  const scatterPts=NOV.map(d=>({x:d.s16||99.5,y:d.ani,_d:d}));
+  const aniChart=new Chart(document.getElementById("c-ani"),{
+    type:"scatter",
+    data:{datasets:[{
+      data:scatterPts.map(p=>({x:p.x,y:p.y})),
+      backgroundColor:scatterPts.map(p=>gc(p._d.genus)+"CC"),
+      pointRadius:8,pointHoverRadius:10,pointBorderWidth:0
+    }]},
+    options:{...JSON.parse(JSON.stringify(DEFS)),
+      plugins:{legend:{display:false},tooltip:{enabled:false}},
+      scales:{
+        x:{min:78,max:101,title:{display:true,text:"16S rRNA similarity (%)",font:{family:"DM Mono",size:10},color:"#6B6860"},grid:{color:"#F0EDE7"}},
+        y:{min:75,max:96,title:{display:true,text:"ANI (%)",font:{family:"DM Mono",size:10},color:"#6B6860"},grid:{color:"#F0EDE7"}}
+      }
+    },
+    plugins:[{
+      id:"refLines",
+      afterDraw(chart){
+        const{ctx,chartArea:{left,right,top,bottom},scales:{x,y}}=chart;
+        // ANI boundary line
+        const yPx=y.getPixelForValue(95.5);
+        ctx.save();ctx.beginPath();ctx.setLineDash([6,4]);
+        ctx.strokeStyle="rgba(201,78,32,0.65)";ctx.lineWidth=1.5;
+        ctx.moveTo(left,yPx);ctx.lineTo(right,yPx);ctx.stroke();
+        ctx.font="9px DM Mono";ctx.fillStyle="#C94E20";ctx.fillText("ANI 95.5% species boundary",left+4,yPx-4);
+        // 16S line
+        const xPx=x.getPixelForValue(98.7);
+        ctx.beginPath();ctx.setLineDash([6,4]);
+        ctx.strokeStyle="rgba(24,95,165,0.5)";ctx.lineWidth=1.5;
+        ctx.moveTo(xPx,top);ctx.lineTo(xPx,bottom);ctx.stroke();
+        ctx.fillStyle="#185FA5";ctx.fillText("16S 98.7%",xPx+3,top+12);
+        ctx.restore();
+      }
+    }]
+  });
+
+  // Hover tooltip
+  const tip=document.getElementById("tip");
+  document.getElementById("c-ani").addEventListener("mousemove",e=>{
+    const pts=aniChart.getElementsAtEventForMode(e,"nearest",{intersect:true},false);
+    if(pts.length){
+      const idx=pts[0].index,d=NOV[idx];
+      tip.innerHTML=`<strong>${d.genus}</strong><br>${d.id}<br>ANI: ${d.ani}% · AAI: ${d.aai||"—"}%<br>16S: ${d.s16||"—"}%`;
+      tip.style.display="block";tip.style.left=(e.clientX+14)+"px";tip.style.top=(e.clientY-8)+"px";
+    }else{tip.style.display="none";}
+  });
+  document.getElementById("c-ani").addEventListener("mouseleave",()=>tip.style.display="none");
+
+  // Novel per genus bar
+  const gc2={};NOV.forEach(d=>{gc2[d.genus]=(gc2[d.genus]||0)+1;});
+  const gcs=Object.entries(gc2).sort((a,b)=>b[1]-a[1]);
+  mk("c-ngenus","bar",{
+    labels:gcs.map(([g])=>g),
+    datasets:[{data:gcs.map(([,n])=>n),backgroundColor:gcs.map(([g])=>gc(g)+"CC"),borderRadius:4}]
+  },{
+    indexAxis:"y",plugins:{legend:{display:false}},
+    scales:{x:{grid:{color:"#F0EDE7"},ticks:{stepSize:1}},y:{ticks:{font:{family:"DM Mono",size:10}}}}
+  });
+
+  // Min ANI per genus
+  mk("c-anirange","bar",{
+    labels:gcs.map(([g])=>g),
+    datasets:[{
+      data:gcs.map(([g])=>Math.min(...NOV.filter(d=>d.genus===g).map(d=>d.ani))),
+      backgroundColor:gcs.map(([g])=>gc(g)+"88"),borderRadius:3
+    }]
+  },{
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{grid:{display:false},ticks:{font:{family:"DM Mono",size:9}}},
+      y:{min:75,max:96,grid:{color:"#F0EDE7"},ticks:{font:{family:"DM Mono",size:9}}}
+    }
+  });
+
+  // Novel table
+  document.getElementById("novel-tb").innerHTML=
+    [...NOV].sort((a,b)=>a.ani-b.ani).map(d=>{
+      const ac=d.ani<85?"#C94E20":d.ani<92?"#B8650E":"#0F8A63";
+      return`<tr>
+        <td style="font-family:var(--mono);font-size:10px">${d.id}</td>
+        <td><em>${d.genus}</em></td>
+        <td style="font-size:10px;color:var(--muted)">${d.ref}</td>
+        <td style="font-family:var(--mono);color:${ac};font-weight:600">${d.ani}</td>
+        <td style="font-family:var(--mono)">${d.aai||"—"}</td>
+        <td style="font-family:var(--mono)">${d.pocp||"—"}</td>
+        <td style="font-family:var(--mono)">${d.s16||"—"}</td>
+        <td><span class="pill" style="background:#FFF7ED;color:#9A3412">Novel</span></td>
+      </tr>`;
+    }).join("");
+}
+
+// ── PAGE 5 ────────────────────────────────────────────────────────
+function initP5(){
+  const passed=QC.filter(d=>d.st==="Passed");
+  const failed=QC.filter(d=>d.st==="Failed");
+
+  // QC Scatter with custom green zone drawn via plugin
+  const qcChart=new Chart(document.getElementById("c-qcsc"),{
+    type:"scatter",
+    data:{datasets:[
+      {label:"Passed",data:passed.map(d=>({x:d.cont,y:d.comp,_a:d.a,_m:d.m})),
+       backgroundColor:passed.map(d=>mc(d.m)+"BB"),pointRadius:6},
+      {label:"Failed",data:failed.map(d=>({x:d.cont,y:d.comp,_a:d.a,_m:d.m})),
+       backgroundColor:"#C93B3BAA",pointRadius:7,pointStyle:"crossRot"}
+    ]},
+    options:{...JSON.parse(JSON.stringify(DEFS)),
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const p=c.raw;return ` ${p._m} | Comp: ${p.y}% | Cont: ${p.x}%`;}}}},
+      scales:{
+        x:{min:0,max:1.5,title:{display:true,text:"Contamination (%)",font:{family:"DM Mono",size:10},color:"#6B6860"},grid:{color:"#F0EDE7"}},
+        y:{min:75,max:101,title:{display:true,text:"Completeness (%)",font:{family:"DM Mono",size:10},color:"#6B6860"},grid:{color:"#F0EDE7"}}
+      }
+    },
+    plugins:[{id:"passZone",beforeDraw(chart){
+      const{ctx,chartArea:{left,right,top,bottom},scales:{x,y}}=chart;
+      const x1=left,x2=x.getPixelForValue(5),y1=y.getPixelForValue(100.5),y2=y.getPixelForValue(90);
+      ctx.save();ctx.fillStyle="rgba(15,138,99,0.07)";ctx.fillRect(x1,y1,x2-x1,y2-y1);
+      ctx.strokeStyle="rgba(15,138,99,0.3)";ctx.lineWidth=1;ctx.setLineDash([4,4]);
+      ctx.strokeRect(x1,y1,x2-x1,y2-y1);
+      ctx.font="9px DM Mono";ctx.fillStyle="#0F8A63";ctx.fillText("QC pass zone",x1+4,y1+12);
+      ctx.restore();
+    }}]
+  });
+
+  // Completeness bins
+  const bins=["<90","90–95","95–99",">99"];
+  const bd={};MISSIONS.forEach(m=>bd[m]=[0,0,0,0]);
+  QC.forEach(d=>{const m=d.m;if(!bd[m])return;const c=d.comp;if(c<90)bd[m][0]++;else if(c<95)bd[m][1]++;else if(c<99)bd[m][2]++;else bd[m][3]++;});
+  mk("c-comp","bar",{
+    labels:bins,
+    datasets:MISSIONS.map(m=>({label:m,data:bd[m],backgroundColor:mc(m),borderRadius:3}))
+  },{
+    plugins:{legend:{display:true,position:"bottom",labels:{font:{family:"Plus Jakarta Sans",size:11},padding:10,boxWidth:9,usePointStyle:true,pointStyle:"rect"}}},
+    scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:"#F0EDE7"}}}
+  });
+
+  // N50 mean per mission
+  const n50m={};MISSIONS.forEach(m=>n50m[m]=[]);
+  QC.forEach(d=>{if(d.n50&&n50m[d.m])n50m[d.m].push(d.n50);});
+  mk("c-n50","bar",{
+    labels:MISSIONS,
+    datasets:[{data:MISSIONS.map(m=>n50m[m].length?Math.round(n50m[m].reduce((s,v)=>s+v,0)/n50m[m].length):0),backgroundColor:MISSIONS.map(mc),borderRadius:5}]
+  },{
+    plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false}},y:{title:{display:true,text:"N50 (bp)",font:{family:"DM Mono",size:10},color:"#6B6860"},grid:{color:"#F0EDE7"}}}
+  });
+
+  // QC pass/fail stacked
+  mk("c-qcbar","bar",{
+    labels:MISSIONS,
+    datasets:[
+      {label:"Passed QC",data:[282,231,86,268],backgroundColor:MISSIONS.map(mc),borderRadius:4},
+      {label:"Failed QC",data:[28,15,8,8],backgroundColor:"#C93B3B77",borderRadius:4}
+    ]
+  },{
+    plugins:{legend:{display:true,position:"bottom",labels:{font:{family:"Plus Jakarta Sans",size:11},padding:10,boxWidth:9,usePointStyle:true,pointStyle:"rect"}}},
+    scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:"#F0EDE7"}}}
+  });
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────
+const inited={p1:true,p2:true};
+function go(id,el){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".ni").forEach(n=>n.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  el.classList.add("active");
+  window.scrollTo(0,0);
+  if(!inited[id]){
+    inited[id]=true;
+    if(id==="p3")initP3();
+    if(id==="p4")initP4();
+    if(id==="p5")initP5();
+  }
+}
+</script>
+</body>
+</html>
