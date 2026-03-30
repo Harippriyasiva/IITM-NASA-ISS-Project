@@ -128,8 +128,8 @@ canvas{display:block;width:100%!important;max-width:100%}
     <div class="card">
       <div class="ct">Strain count by mission level</div>
       <div class="leg">
-        <div class="li"><div class="ld" style="background:var(--premt)"></div>Pre-MT (282)</div>
-        <div class="li"><div class="ld" style="background:var(--mt1)"></div>MT-1 (232)</div>
+        <div class="li"><div class="ld" style="background:var(--premt)"></div>Pre-MT (283)</div>
+        <div class="li"><div class="ld" style="background:var(--mt1)"></div>MT-1 (231)</div>
         <div class="li"><div class="ld" style="background:var(--mt2)"></div>MT-2 (86)</div>
         <div class="li"><div class="ld" style="background:var(--mt3)"></div>MT-3 (268)</div>
       </div>
@@ -433,7 +433,7 @@ function merge(a,b){return Object.assign(JSON.parse(JSON.stringify(a)),b)}
 
 // ── PAGE 1 ────────────────────────────────────────────────────────
 mk("c-donut","doughnut",{
-  labels:["Pre-MT (282)","MT-1 (232)","MT-2 (86)","MT-3 (268)"],
+  labels:["Pre-MT (283)","MT-1 (231)","MT-2 (86)","MT-3 (268)"],
   datasets:[{data:[283,231,86,268],backgroundColor:["#3C3489","#185FA5","#B8650E","#0F8A63"],borderWidth:3,borderColor:"#fff",hoverOffset:4}]
 },{
   plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>" "+c.label+": "+c.parsed+" strains"}}},
@@ -759,7 +759,7 @@ function initP5(){
   mk("c-qcbar","bar",{
     labels:MISSIONS,
     datasets:[
-      {label:"Passed QC",data:[282,231,86,268],backgroundColor:MISSIONS.map(mc),borderRadius:4},
+      {label:"Passed QC",data:[283,231,86,268],backgroundColor:MISSIONS.map(mc),borderRadius:4},
       {label:"Failed QC",data:[28,15,8,8],backgroundColor:"#C93B3B77",borderRadius:4}
     ]
   },{
