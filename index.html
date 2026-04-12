@@ -8,7 +8,7 @@
 <style>
 :root{
   --premt:#3C3489;--mt1:#185FA5;--mt2:#B8650E;--mt3:#0F8A63;
-  --novel:#C94E20;--bsl2:#C93B3B;--bsl1:#4A8A1E;
+  --novel:#C94E20;--bsl2:#C93B3B;--bsl1:#4A8A1E;--fn:#1A6E5E;
   --bg:#F5F3EE;--card:#FFFFFF;--border:#E2DED6;
   --text:#1C1B18;--muted:#6B6860;--faint:#F0EDE7;
   --sans:'Plus Jakarta Sans',sans-serif;
@@ -86,6 +86,52 @@ canvas{display:block;width:100%!important;max-width:100%}
 .li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
 .ld{width:9px;height:9px;border-radius:50%;flex-shrink:0}
 .ls{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+
+/* Functional tab styles */
+.fn-tab{background:var(--faint);border:1px solid var(--border);color:var(--muted);padding:7px 14px;border-radius:20px;cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:500;transition:all .15s}
+.fn-tab:hover{border-color:var(--fn);color:var(--fn)}
+.fn-tab-active{background:var(--fn);border-color:var(--fn);color:#fff}
+
+/* ── RESPONSIVE LAYOUT ── */
+@media (max-width: 1024px) {
+  .shell { grid-template-columns: 180px 1fr; }
+  .krow  { grid-template-columns: repeat(2, 1fr); }
+  .c2    { grid-template-columns: 1fr; }
+  .c3    { grid-template-columns: 1fr 1fr; }
+  .cn    { grid-template-columns: 1fr; }
+  .cw    { grid-template-columns: 1fr; }
+  .main  { padding: 20px 18px; }
+}
+@media (max-width: 768px) {
+  .shell { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .sidebar {
+    position: relative; height: auto;
+    flex-direction: row; flex-wrap: wrap;
+    padding: 0; overflow: visible;
+  }
+  .logo  { padding: 14px 16px 10px; border-bottom: none; border-right: 1px solid rgba(255,255,255,0.07); }
+  .nav   { display: flex; flex-direction: row; flex-wrap: wrap; gap: 4px; padding: 8px 12px; align-items: center; flex: 1; }
+  .ns    { display: none; }
+  .ni    { padding: 5px 10px; border-radius: 20px; font-size: 11px; }
+  .nb    { display: none; }
+  .sf    { display: none; }
+  .main  { padding: 14px 12px; }
+  .krow  { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .c2, .c3, .cn, .cw { grid-template-columns: 1fr; }
+  .g     { gap: 10px; }
+  .fn-tab { font-size: 11px; padding: 6px 11px; }
+  .pt    { font-size: 20px; }
+  .tbl th, .tbl td { padding: 5px 7px; font-size: 10px; }
+}
+@media (max-width: 480px) {
+  .krow  { grid-template-columns: 1fr 1fr; gap: 7px; }
+  .kn    { font-size: 20px; }
+  .kpi   { padding: 12px 13px; }
+  .main  { padding: 10px 10px; }
+  .card  { padding: 13px 13px; }
+  .fn-tab { font-size: 10px; padding: 5px 9px; }
+  .logo-t { font-size: 14px; }
+}
 </style>
 </head>
 <body>
@@ -106,6 +152,8 @@ canvas{display:block;width:100%!important;max-width:100%}
     <div class="ni" onclick="go('p3',this)"><div class="nd" style="background:var(--mt2)"></div>Species Profile<span class="nb">Top 15</span></div>
     <div class="ns">Section 2</div>
     <div class="ni" onclick="go('p4',this)"><div class="nd" style="background:var(--novel)"></div>Novel Species<span class="nb">17</span></div>
+    <div class="ns">Section 3</div>
+    <div class="ni" onclick="go('p6',this)"><div class="nd" style="background:var(--fn)"></div>Functional Genomics<span class="nb">4 tools</span></div>
     <div class="ns">Quality</div>
     <div class="ni" onclick="go('p5',this)"><div class="nd" style="background:var(--bsl1)"></div>Genome QC<span class="nb">QC</span></div>
   </nav>
@@ -226,7 +274,7 @@ canvas{display:block;width:100%!important;max-width:100%}
     <div class="cstack">
       <div class="card">
         <div class="ct">BSL risk profile</div>
-        <div style="height:150px"><canvas id="c-bsl"></canvas></div>
+        <div style="height:195px"><canvas id="c-bsl"></canvas></div>
       </div>
       <div class="card">
         <div class="ct">Staphylococcus dominance</div>
@@ -234,7 +282,7 @@ canvas{display:block;width:100%!important;max-width:100%}
       </div>
       <div class="card">
         <div class="ct">Pathogen categories</div>
-        <div style="height:140px"><canvas id="c-path"></canvas></div>
+        <div style="height:200px"><canvas id="c-path"></canvas></div>
       </div>
     </div>
   </div>
@@ -274,6 +322,154 @@ canvas{display:block;width:100%!important;max-width:100%}
         <thead><tr><th>Strain ID</th><th>Genus</th><th>Closest type strain</th><th>ANI (%)</th><th>AAI (%)</th><th>PoCP (%)</th><th>16S Sim (%)</th><th>Status</th></tr></thead>
         <tbody id="novel-tb"></tbody>
       </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- PAGE 6: FUNCTIONAL GENOMICS -->
+<div class="page" id="p6">
+  <div class="ph">
+    <div class="pe">Section 3 · Functional Genomics</div>
+    <div class="pt">Functional Annotation &amp; Comparative Genomic Profiling</div>
+    <div class="pd">Comprehensive functional characterisation of 17 candidate novel ISS strains: COG annotation (Prokka), AMR/virulence/metal resistance (ABRicate — CARD, NCBI, VFDB, BacMet), biosynthetic gene clusters (antiSMASH), and mobilome analysis (geNomad — plasmids &amp; bacteriophages).</div>
+  </div>
+
+  <div class="krow">
+    <div class="kpi" style="--c:var(--fn)"><div class="kn">94</div><div class="kl">BGCs detected</div><div class="ks">antiSMASH · 17 strains</div></div>
+    <div class="kpi" style="--c:var(--fn)"><div class="kn">121</div><div class="kl">Plasmid sequences</div><div class="ks">geNomad · 16 of 17 strains</div></div>
+    <div class="kpi" style="--c:var(--fn)"><div class="kn">25</div><div class="kl">Viral sequences</div><div class="ks">geNomad · 15 of 17 strains</div></div>
+    <div class="kpi" style="--c:#B8650E"><div class="kn">10</div><div class="kl">AMR-positive strains</div><div class="ks">CARD + NCBI databases</div></div>
+  </div>
+
+  <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+    <button class="fn-tab fn-tab-active" onclick="fnTab('cog',this)">🧬 COG Annotation</button>
+    <button class="fn-tab" onclick="fnTab('amr',this)">🛡️ AMR &amp; Resistance</button>
+    <button class="fn-tab" onclick="fnTab('bgc',this)">⚗️ Biosynthetic Gene Clusters</button>
+    <button class="fn-tab" onclick="fnTab('mobilome',this)">🔄 Mobilome</button>
+  </div>
+
+  <!-- ══ COG ══ -->
+  <div id="fn-cog" class="fn-panel">
+    <div class="card" style="margin-bottom:14px">
+      <div class="ct">COG Functional Category Distribution — Top 10 cumulative gene counts across 17 strains</div>
+      <div style="height:280px"><canvas id="c-cog-bar"></canvas></div>
+      <div class="cn2">Amino acid metabolism (E) and transcription (K) dominate — reflecting metabolic versatility and complex regulatory networks essential for ISS survival. Defense mechanisms (V) and mobilome (X) confirm ISS-specific adaptive pressure.</div>
+    </div>
+    <div class="g c2">
+      <div class="card">
+        <div class="ct">COG profile per strain — key functional categories</div>
+        <div style="height:360px;overflow:auto"><canvas id="c-cog-heat"></canvas></div>
+        <div class="cn2">Horizontal grouped bars showing 11 COG categories per strain. Ralstonia strains show the broadest functional repertoire across all categories.</div>
+      </div>
+      <div class="card">
+        <div class="ct">Average COG profile — ISS-relevant categories (radar)</div>
+        <div style="height:360px"><canvas id="c-cog-radar"></canvas></div>
+        <div class="cn2">Radar shows mean gene count per category across all 17 strains. Energy production, ion transport, and defense are notably elevated relative to typical environmental bacteria.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ AMR ══ -->
+  <div id="fn-amr" class="fn-panel" style="display:none">
+    <div class="card" style="margin-bottom:14px">
+      <div class="ct">AMR &amp; Resistance gene hits per strain — NCBI AMR · CARD · VFDB · BacMet (÷4 scaled)</div>
+      <div style="height:260px"><canvas id="c-amr-bar"></canvas></div>
+      <div class="cn2"><em>Ralstonia insidiosa</em> strains (8) consistently carry OXA-573 (carbapenem) and OXA-574 (β-lactam) genes. <em>S. warneri</em> 140720001-1 has the highest CARD hit count (5). <em>Streptococcus</em> sp. is the only strain with VFDB virulence hits (5 adherence factors). BacMet values scaled ÷4 for display — hover for true count.</div>
+    </div>
+    <div class="g c2" style="margin-bottom:14px">
+      <div class="card">
+        <div class="ct">CARD resistance class distribution</div>
+        <div style="height:240px"><canvas id="c-amr-class"></canvas></div>
+        <div class="cn2">β-lactam/carbapenem resistance dominates (Ralstonia clade). Fluoroquinolone resistance detected in Staphylococci. Moenomycin and peptide resistance co-occur in multi-drug resistant strains.</div>
+      </div>
+      <div class="card">
+        <div class="ct">BacMet — metal &amp; biocide resistance genes (≥80% identity)</div>
+        <div style="height:240px"><canvas id="c-bacmet"></canvas></div>
+        <div class="cn2">Mercury resistance (<em>mer</em> operon, blue) and chromate/heavy-metal efflux (<em>chrA, cnrA, czcA</em>, red) are most prevalent — consistent with ISS metal surfaces and cleaning biocide exposure.</div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="ct">Complete AMR &amp; resistance profile — all 17 strains (4 databases)</div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>Strain</th><th>NCBI AMR</th><th>CARD</th><th>VFDB</th><th>BacMet</th><th>Total</th><th>Key genes</th><th>Resistance classes</th></tr></thead>
+          <tbody id="amr-tb"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">VFDB virulence gene details — <em>Streptococcus</em> sp. 151470009-6 (only positive strain)</div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>Strain</th><th>Gene</th><th>Product / function</th><th>% Identity</th></tr></thead>
+          <tbody id="vfdb-tb"></tbody>
+        </table>
+      </div>
+      <div class="cn2">All 5 virulence genes are adherence factors — <em>pavA</em> (fibronectin binding), <em>sipA/srtG1/srtG2</em> (pilus assembly PI-2), <em>psaA</em> (Mn-transport/adhesion). No toxin-encoding genes detected across the 17 novel strains.</div>
+    </div>
+  </div>
+
+  <!-- ══ BGC ══ -->
+  <div id="fn-bgc" class="fn-panel" style="display:none">
+    <div class="card" style="margin-bottom:14px">
+      <div class="ct">BGC count per strain — antiSMASH (total 94 clusters across 17 strains)</div>
+      <div style="height:240px"><canvas id="c-bgc-bar"></canvas></div>
+      <div class="cn2"><em>Ralstonia insidiosa</em> (8 strains) and <em>Methylorubrum extorquens</em> each carry 8 BGCs — the highest biosynthetic potential. <em>Kocuria</em> spp. carry 5 each. NI-siderophore clusters are conserved across multiple genera, suggesting iron acquisition is a shared ISS-adaptive strategy.</div>
+    </div>
+    <div class="g c2" style="margin-bottom:14px">
+      <div class="card">
+        <div class="ct">BGC type distribution — all 94 clusters (polar area)</div>
+        <div style="height:280px"><canvas id="c-bgc-type"></canvas></div>
+        <div class="cn2">NI-siderophore (14), terpene (12), and betalactone (10) dominate. T1PKS, arylpolyene, butyrolactone, and hydrogen-cyanide (8 each) reflect genus-level conservation. NRPS clusters (2) indicate potential for novel peptide bioactives.</div>
+      </div>
+      <div class="card">
+        <div class="ct">High-confidence BGCs — ≥50% MIBiG similarity (13 clusters)</div>
+        <div style="overflow-x:auto;max-height:280px">
+          <table class="tbl" style="font-size:11px">
+            <thead><tr><th>Strain</th><th>BGC type</th><th>Most similar known cluster</th><th>Category</th><th>Similarity</th></tr></thead>
+            <tbody id="bgc-hc-tb"></tbody>
+          </table>
+        </div>
+        <div class="cn2">3 BGCs reach 100% similarity: staphyloferrin A (siderophore) in both S. warneri strains, and carotenoid terpene in M. extorquens — functionally confirmed. 8 Ralstonia strains share an alcaligin-like siderophore cluster at 62% similarity.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MOBILOME ══ -->
+  <div id="fn-mob" class="fn-panel" style="display:none">
+    <div class="g c2" style="margin-bottom:14px">
+      <div class="card">
+        <div class="ct">Plasmid sequences per strain — geNomad</div>
+        <div style="height:240px"><canvas id="c-plasm-bar"></canvas></div>
+        <div class="cn2"><em>R. insidiosa</em> 121560039-2 (17 plasmids) and 123250053-1 (14 plasmids) have the highest plasmid burden. <em>Rothia mucilaginosa</em> is the only plasmid-free strain. High plasmid counts in Ralstonia suggest active horizontal gene transfer.</div>
+      </div>
+      <div class="card">
+        <div class="ct">Viral/prophage sequences per strain — geNomad</div>
+        <div style="height:240px"><canvas id="c-virus-bar"></canvas></div>
+        <div class="cn2">All 25 viral sequences are Caudoviricetes (dsDNA tailed phages). <em>S. warneri</em> 121210007-3 carries 4 viral sequences — the highest. 2 strains (Sphingomonas, Rothia) are entirely phage-free.</div>
+      </div>
+    </div>
+    <div class="g c2" style="margin-bottom:14px">
+      <div class="card">
+        <div class="ct">Plasmid functional classification — AMR &amp; conjugation marker prevalence</div>
+        <div style="height:220px"><canvas id="c-plasm-amr"></canvas></div>
+        <div class="cn2">Of 121 plasmid sequences: 56 carry AMR marker genes and 35 carry conjugation genes — indicating active horizontal gene transfer capacity within the ISS microbiome.</div>
+      </div>
+      <div class="card">
+        <div class="ct">Mobilome burden — plasmid vs viral sequences (bubble = plasmid size)</div>
+        <div style="height:220px"><canvas id="c-mob-bubble"></canvas></div>
+        <div class="cn2">The Ralstonia clade (purple) dominates both axes. Bubble radius scales with plasmid count. Strains in the top-right combine high plasmid and viral burden — maximum genomic plasticity.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">Complete geNomad mobilome summary — all 17 strains</div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>Strain</th><th>Plasmid seqs</th><th>Viral seqs</th><th>Plasmids w/ AMR</th><th>Plasmids w/ Conjugation</th><th>Phage lineage</th></tr></thead>
+          <tbody id="mob-tb"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
@@ -330,35 +526,35 @@ canvas{display:block;width:100%!important;max-width:100%}
 <script>
 // ── DATA ─────────────────────────────────────────────────────────
 const SP=[
-  {o:"Staphylococcus hominis",m:"Pre-MT",c:60,t:102,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
-  {o:"Staphylococcus hominis",m:"MT-1",c:18,t:102,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
-  {o:"Staphylococcus hominis",m:"MT-3",c:24,t:102,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
-  {o:"Staphylococcus epidermidis",m:"Pre-MT",c:70,t:99,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
-  {o:"Staphylococcus epidermidis",m:"MT-1",c:24,t:99,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
-  {o:"Staphylococcus epidermidis",m:"MT-3",c:5,t:99,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
-  {o:"Staphylococcus saprophyticus",m:"Pre-MT",c:7,t:85,p:"Opportunistic pathogen",b:"BSL-2"},
-  {o:"Staphylococcus saprophyticus",m:"MT-1",c:21,t:85,p:"Opportunistic pathogen",b:"BSL-2"},
-  {o:"Staphylococcus saprophyticus",m:"MT-2",c:8,t:85,p:"Opportunistic pathogen",b:"BSL-2"},
-  {o:"Staphylococcus saprophyticus",m:"MT-3",c:49,t:85,p:"Opportunistic pathogen",b:"BSL-2"},
-  {o:"Staphylococcus cohnii",m:"Pre-MT",c:6,t:71,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
-  {o:"Staphylococcus cohnii",m:"MT-3",c:65,t:71,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
-  {o:"Pseudomonas fulva",m:"MT-2",c:43,t:43,p:"Opportunistic pathogen (rare)",b:"BSL-2"},
+  {o:"Staphylococcus hominis",m:"Pre-MT",c:60,t:102,p:"Opportunistic Pathogen / Commensal",b:"BSL-2"},
+  {o:"Staphylococcus hominis",m:"MT-1",c:18,t:102,p:"Opportunistic Pathogen / Commensal",b:"BSL-2"},
+  {o:"Staphylococcus hominis",m:"MT-3",c:24,t:102,p:"Opportunistic Pathogen / Commensal",b:"BSL-2"},
+  {o:"Staphylococcus epidermidis",m:"Pre-MT",c:70,t:99,p:"Opportunistic Pathogen / Commensal",b:"BSL-2"},
+  {o:"Staphylococcus epidermidis",m:"MT-1",c:24,t:99,p:"Opportunistic Pathogen / Commensal",b:"BSL-2"},
+  {o:"Staphylococcus epidermidis",m:"MT-3",c:5,t:99,p:"Opportunistic Pathogen / Commensal",b:"BSL-2"},
+  {o:"Staphylococcus saprophyticus",m:"Pre-MT",c:7,t:85,p:"Opportunistic Pathogen",b:"BSL-2"},
+  {o:"Staphylococcus saprophyticus",m:"MT-1",c:21,t:85,p:"Opportunistic Pathogen",b:"BSL-2"},
+  {o:"Staphylococcus saprophyticus",m:"MT-2",c:8,t:85,p:"Opportunistic Pathogen",b:"BSL-2"},
+  {o:"Staphylococcus saprophyticus",m:"MT-3",c:49,t:85,p:"Opportunistic Pathogen",b:"BSL-2"},
+  {o:"Staphylococcus cohnii",m:"Pre-MT",c:6,t:71,p:"Opportunistic Pathogen / Commensal",b:"BSL-2"},
+  {o:"Staphylococcus cohnii",m:"MT-3",c:65,t:71,p:"Opportunistic Pathogen / Commensal",b:"BSL-2"},
+  {o:"Pseudomonas fulva",m:"MT-2",c:43,t:43,p:"Opportunistic Pathogen (rare)",b:"BSL-2"},
   {o:"Micrococcus aloeverae",m:"MT-3",c:40,t:40,p:"Non-pathogenic / Environmental",b:"BSL-1"},
   {o:"Pantoea piersonii",m:"MT-1",c:7,t:34,p:"Non-pathogenic / Environmental",b:"BSL-1"},
   {o:"Pantoea piersonii",m:"MT-3",c:27,t:34,p:"Non-pathogenic / Environmental",b:"BSL-1"},
-  {o:"Staphylococcus aureus",m:"MT-1",c:34,t:34,p:"Major pathogen / Opportunistic",b:"BSL-2"},
-  {o:"Ralstonia pickettii",m:"Pre-MT",c:32,t:32,p:"Opportunistic pathogen",b:"BSL-2"},
-  {o:"Staphylococcus capitis",m:"Pre-MT",c:25,t:31,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
-  {o:"Staphylococcus capitis",m:"MT-1",c:6,t:31,p:"Opportunistic pathogen / Commensal",b:"BSL-2"},
-  {o:"Enterococcus faecalis",m:"Pre-MT",c:1,t:23,p:"Opportunistic pathogen",b:"BSL-2"},
-  {o:"Enterococcus faecalis",m:"MT-1",c:15,t:23,p:"Opportunistic pathogen",b:"BSL-2"},
-  {o:"Enterococcus faecalis",m:"MT-3",c:7,t:23,p:"Opportunistic pathogen",b:"BSL-2"},
-  {o:"Acinetobacter pittii",m:"MT-1",c:5,t:20,p:"Opportunistic pathogen",b:"BSL-2"},
-  {o:"Acinetobacter pittii",m:"MT-2",c:15,t:20,p:"Opportunistic pathogen",b:"BSL-2"},
+  {o:"Staphylococcus aureus",m:"MT-1",c:34,t:34,p:"Major Pathogen / Opportunistic",b:"BSL-2"},
+  {o:"Ralstonia pickettii",m:"Pre-MT",c:32,t:32,p:"Opportunistic Pathogen",b:"BSL-2"},
+  {o:"Staphylococcus capitis",m:"Pre-MT",c:25,t:31,p:"Opportunistic Pathogen / Commensal",b:"BSL-2"},
+  {o:"Staphylococcus capitis",m:"MT-1",c:6,t:31,p:"Opportunistic Pathogen / Commensal",b:"BSL-2"},
+  {o:"Enterococcus faecalis",m:"Pre-MT",c:1,t:23,p:"Opportunistic Pathogen",b:"BSL-2"},
+  {o:"Enterococcus faecalis",m:"MT-1",c:15,t:23,p:"Opportunistic Pathogen",b:"BSL-2"},
+  {o:"Enterococcus faecalis",m:"MT-3",c:7,t:23,p:"Opportunistic Pathogen",b:"BSL-2"},
+  {o:"Acinetobacter pittii",m:"MT-1",c:5,t:20,p:"Opportunistic Pathogen",b:"BSL-2"},
+  {o:"Acinetobacter pittii",m:"MT-2",c:15,t:20,p:"Opportunistic Pathogen",b:"BSL-2"},
   {o:"Micrococcus yunnanensis",m:"Pre-MT",c:2,t:18,p:"Non-pathogenic / Environmental",b:"BSL-1"},
   {o:"Micrococcus yunnanensis",m:"MT-3",c:16,t:18,p:"Non-pathogenic / Environmental",b:"BSL-1"},
-  {o:"Pantoea brenneri",m:"MT-1",c:18,t:18,p:"Opportunistic pathogen",b:"BSL-2"},
-  {o:"Enterobacter bugandensis",m:"MT-1",c:15,t:15,p:"Opportunistic pathogen",b:"BSL-2"}
+  {o:"Pantoea brenneri",m:"MT-1",c:18,t:18,p:"Opportunistic Pathogen",b:"BSL-2"},
+  {o:"Enterobacter bugandensis",m:"MT-1",c:15,t:15,p:"Opportunistic Pathogen",b:"BSL-2"}
 ];
 
 const NOV=[
@@ -575,7 +771,7 @@ function initP3(){
     datasets:[{data:[b1,b2],backgroundColor:["#4A8A1E","#C93B3B"],borderWidth:3,borderColor:"#fff"}]
   },{
     cutout:"55%",
-    plugins:{legend:{display:true,position:"bottom",labels:{font:{family:"Plus Jakarta Sans",size:10},padding:8,boxWidth:9,usePointStyle:true,pointStyle:"circle"}}},
+    plugins:{legend:{display:true,position:"bottom",labels:{font:{family:"Plus Jakarta Sans",size:11},padding:10,boxWidth:10,usePointStyle:true,pointStyle:"circle"}}},
     scales:{x:{display:false},y:{display:false}}
   });
 
@@ -591,14 +787,18 @@ function initP3(){
   // Pathogen categories
   const cats={};const orgS=new Set();
   SP.forEach(d=>{if(!orgS.has(d.o)){orgS.add(d.o);const c=d.p||"Unknown";cats[c]=(cats[c]||0)+d.t;}});
-  const cl=Object.keys(cats);
+  const cl=Object.keys(cats).sort((a,b)=>cats[b]-cats[a]);
   mk("c-path","bar",{
-    labels:cl.map(l=>l.length>22?l.slice(0,21)+"…":l),
-    datasets:[{data:cl.map(l=>cats[l]),backgroundColor:cl.map(l=>l.includes("Major")?"#C93B3B":l.includes("Non-path")||l.includes("Environ")?"#4A8A1E":"#B8650E"),borderRadius:3}]
+    labels:cl,
+    datasets:[{data:cl.map(l=>cats[l]),backgroundColor:cl.map(l=>l.includes("Major")?"#C93B3B":l.includes("Non-path")||l.includes("Environ")?"#4A8A1E":l.includes("rare")?"#B8650E":"#D4820A"),borderRadius:3,barThickness:18}]
   },{
     indexAxis:"y",
-    plugins:{legend:{display:false}},
-    scales:{x:{grid:{color:"#F0EDE7"},ticks:{font:{family:"DM Mono",size:9}}},y:{ticks:{font:{family:"DM Mono",size:9}}}}
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:t=>" "+t.parsed.x+" strains"}}},
+    scales:{
+      x:{grid:{color:"#F0EDE7"},ticks:{font:{family:"DM Mono",size:10}},border:{display:false}},
+      y:{ticks:{font:{family:"DM Mono",size:10},padding:4},grid:{display:false}}
+    },
+    layout:{padding:{right:10}}
   });
 }
 
@@ -781,8 +981,245 @@ function go(id,el){
     if(id==="p3")initP3();
     if(id==="p4")initP4();
     if(id==="p5")initP5();
+    if(id==="p6")initP6();
   }
 }
+
+// ══════════ SECTION 3 – FUNCTIONAL GENOMICS (REAL DATA) ══════════
+
+function fnTab(name, el){
+  document.querySelectorAll('.fn-panel').forEach(p=>p.style.display='none');
+  document.querySelectorAll('.fn-tab').forEach(b=>b.classList.remove('fn-tab-active'));
+  el.classList.add('fn-tab-active');
+  var map={cog:'fn-cog',amr:'fn-amr',bgc:'fn-bgc',mobilome:'fn-mob'};
+  document.getElementById(map[name]).style.display='block';
+}
+var FN = {
+  strainNames: ["Kocuria rhizophila 111540051-3", "Ralstonia insidiosa 151470044-1", "Ralstonia insidiosa 130770013-1", "Staphylococcus warneri 121210007-3", "Sphingomonas lutea F9_3S_D5_B_2", "Streptococcus sp. 151470009-6", "Staphylococcus hominis 153480033-6", "Ralstonia insidiosa 142550021-1", "Rothia mucilaginosa 110740021-2", "Ralstonia insidiosa 142550027-2", "Methylorubrum extorquens 153480035-1", "Ralstonia insidiosa 151470066-2", "Ralstonia insidiosa 151470066-1", "Ralstonia insidiosa 123250053-1", "Kocuria marina F10_7S_D2_EB4", "Ralstonia insidiosa 121560039-2", "Staphylococcus warneri 140720001-1"],
+  shortNames:  ["K. rhizophila 111540051-3", "R. insidiosa 151470044-1", "R. insidiosa 130770013-1", "S. warneri 121210007-3", "S. lutea F9_3S_D5_B_2", "S. sp. 151470009-6", "S. hominis 153480033-6", "R. insidiosa 142550021-1", "R. mucilaginosa 110740021-2", "R. insidiosa 142550027-2", "M. extorquens 153480035-1", "R. insidiosa 151470066-2", "R. insidiosa 151470066-1", "R. insidiosa 123250053-1", "K. marina F10_7S_D2_EB4", "R. insidiosa 121560039-2", "S. warneri 140720001-1"],
+  top10Labels: ["Amino acid metabolism (E)", "Transcription (K)", "Cell wall/membrane (M)", "General function (R)", "Translation (J)", "Inorganic ion transport (P)", "Energy production (C)", "Lipid metabolism (I)", "Carbohydrate metabolism (G)", "Signal transduction (T)"],
+  top10Vals:   [5042, 4742, 4109, 3709, 3669, 3411, 3330, 3266, 3180, 3082],
+  heatDatasets:[{"label": "Amino acid (E)", "data": [210, 423, 423, 192, 137, 144, 177, 423, 131, 423, 259, 423, 423, 423, 205, 430, 196]}, {"label": "Transcription (K)", "data": [120, 452, 452, 142, 98, 96, 117, 452, 67, 452, 206, 452, 452, 454, 142, 453, 135]}, {"label": "Energy (C)", "data": [124, 278, 278, 115, 133, 46, 96, 278, 69, 278, 259, 278, 278, 278, 147, 285, 110]}, {"label": "Cell wall (M)", "data": [99, 364, 363, 118, 170, 93, 99, 364, 87, 364, 288, 364, 364, 367, 114, 374, 117]}, {"label": "Ion transport (P)", "data": [118, 284, 284, 127, 80, 70, 119, 284, 70, 284, 257, 284, 284, 286, 142, 311, 127]}, {"label": "Lipid met. (I)", "data": [128, 290, 290, 90, 116, 58, 83, 290, 50, 290, 168, 290, 290, 291, 148, 304, 90]}, {"label": "Defense (V)", "data": [41, 95, 95, 40, 44, 47, 42, 95, 44, 95, 92, 95, 95, 98, 51, 100, 46]}, {"label": "Signal (T)", "data": [65, 276, 276, 71, 101, 48, 68, 276, 43, 276, 322, 276, 276, 279, 70, 287, 72]}, {"label": "DNA repair (L)", "data": [104, 168, 168, 103, 107, 91, 101, 168, 83, 168, 142, 168, 168, 175, 114, 174, 105]}, {"label": "Sec. metab. (Q)", "data": [49, 97, 97, 25, 41, 10, 21, 97, 16, 97, 74, 97, 97, 97, 56, 99, 23]}, {"label": "Mobilome (X)", "data": [22, 46, 44, 30, 12, 15, 15, 46, 1, 46, 66, 46, 46, 47, 26, 61, 26]}],
+  radarLabels: ["Amino acid", "Transcription", "Energy", "Cell wall", "Ion transport", "Defense", "Signaling", "Mobilome"],
+  radarAvgs:   [297, 279, 196, 242, 201, 71, 181, 35],
+  amrTable:    [{"strain": "Kocuria rhizophila 111540051-3", "ncbi": 0, "card": 0, "vfdb": 0, "bacmet": 0, "genes": "\u2013", "classes": "\u2013"}, {"strain": "Ralstonia insidiosa 151470044-1", "ncbi": 2, "card": 2, "vfdb": 0, "bacmet": 17, "genes": "blaOXA-573, blaOXA-574, OXA-573, OXA-574", "classes": "CARBAPENEM; BETA-LACTAM"}, {"strain": "Ralstonia insidiosa 130770013-1", "ncbi": 2, "card": 2, "vfdb": 0, "bacmet": 17, "genes": "blaOXA-573, blaOXA-574, OXA-573, OXA-574", "classes": "CARBAPENEM; BETA-LACTAM"}, {"strain": "Staphylococcus warneri 121210007-3", "ncbi": 1, "card": 3, "vfdb": 0, "bacmet": 6, "genes": "fusB, mgrA, norA", "classes": "FUSIDIC_ACID; cephalosporin;disinfecting_agents_and_antiseptics;fluoroquinolone;moenomycin;penicillin_beta-lactam;peptide;tetracycline"}, {"strain": "Sphingomonas lutea F9_3S_D5_B_2", "ncbi": 0, "card": 0, "vfdb": 0, "bacmet": 0, "genes": "\u2013", "classes": "\u2013"}, {"strain": "Streptococcus sp. 151470009-6", "ncbi": 0, "card": 3, "vfdb": 5, "bacmet": 4, "genes": "RlmA(II), patA, patB", "classes": "lincosamide;macrolide; fluoroquinolone"}, {"strain": "Staphylococcus hominis 153480033-6", "ncbi": 0, "card": 1, "vfdb": 0, "bacmet": 9, "genes": "mgrA", "classes": "cephalosporin;disinfecting_agents_and_antiseptics;fluoroquinolone;moenomycin;penicillin_beta-lactam;peptide;tetracycline"}, {"strain": "Ralstonia insidiosa 142550021-1", "ncbi": 2, "card": 2, "vfdb": 0, "bacmet": 17, "genes": "blaOXA-573, blaOXA-574, OXA-573, OXA-574", "classes": "CARBAPENEM; BETA-LACTAM"}, {"strain": "Rothia mucilaginosa 110740021-2", "ncbi": 0, "card": 0, "vfdb": 0, "bacmet": 0, "genes": "\u2013", "classes": "\u2013"}, {"strain": "Ralstonia insidiosa 142550027-2", "ncbi": 2, "card": 2, "vfdb": 0, "bacmet": 17, "genes": "blaOXA-573, blaOXA-574, OXA-573, OXA-574", "classes": "CARBAPENEM; BETA-LACTAM"}, {"strain": "Methylorubrum extorquens 153480035-1", "ncbi": 0, "card": 0, "vfdb": 0, "bacmet": 0, "genes": "\u2013", "classes": "\u2013"}, {"strain": "Ralstonia insidiosa 151470066-2", "ncbi": 2, "card": 2, "vfdb": 0, "bacmet": 17, "genes": "blaOXA-573, blaOXA-574, OXA-573, OXA-574", "classes": "CARBAPENEM; BETA-LACTAM"}, {"strain": "Ralstonia insidiosa 151470066-1", "ncbi": 2, "card": 2, "vfdb": 0, "bacmet": 17, "genes": "blaOXA-573, blaOXA-574, OXA-573, OXA-574", "classes": "CARBAPENEM; BETA-LACTAM"}, {"strain": "Ralstonia insidiosa 123250053-1", "ncbi": 2, "card": 2, "vfdb": 0, "bacmet": 17, "genes": "blaOXA-573, blaOXA-574, OXA-573, OXA-574", "classes": "CARBAPENEM; BETA-LACTAM"}, {"strain": "Kocuria marina F10_7S_D2_EB4", "ncbi": 0, "card": 0, "vfdb": 0, "bacmet": 0, "genes": "\u2013", "classes": "\u2013"}, {"strain": "Ralstonia insidiosa 121560039-2", "ncbi": 2, "card": 2, "vfdb": 0, "bacmet": 25, "genes": "blaOXA-573, blaOXA-574, OXA-573, OXA-574", "classes": "CARBAPENEM; BETA-LACTAM"}, {"strain": "Staphylococcus warneri 140720001-1", "ncbi": 2, "card": 5, "vfdb": 0, "bacmet": 10, "genes": "mph(C), msr(A), norA, mgrA, qacA", "classes": "ERYTHROMYCIN;SPIRAMYCIN;TELITHROMYCIN; ERYTHROMYCIN;STREPTOGRAMIN_B"}],
+  cardClLabels:["penicillin_beta-lactam", "cephalosporin", "carbapenem", "fluoroquinolone", "disinfecting_agents_and_antiseptics", "macrolide", "moenomycin", "peptide"],
+  cardClVals:  [19, 11, 8, 8, 5, 3, 3, 3],
+  bacLabels:   ["chrA1", "cnrA", "merA", "pstB", "sodB", "gesB", "golT", "czcA", "chrC", "cnrR/cnrX", "merE", "merD", "merP", "merT", "merF"],
+  bacVals:     [16, 9, 9, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7],
+  vfdbRows:    [{"Genome Name/ Sample Name": "Streptococcus sp. 151470009-6", "GENE": "pavA", "PRODUCT": "(pavA) Fibronectin-binding protein-like protein A [PavA (VF0283) - Adherence (VFC0001)] [Streptococcus pneumoniae R6]", "%IDENTITY": 87.8}, {"Genome Name/ Sample Name": "Streptococcus sp. 151470009-6", "GENE": "sipA", "PRODUCT": "(sipA) signal peptidase I [PI-2 (VF0530) - Adherence (VFC0001)] [Streptococcus pneumoniae Taiwan19F-14]", "%IDENTITY": 91.85}, {"Genome Name/ Sample Name": "Streptococcus sp. 151470009-6", "GENE": "srtG1", "PRODUCT": "(srtG1) sortase SrtB family [PI-2 (VF0530) - Adherence (VFC0001)] [Streptococcus pneumoniae Taiwan19F-14]", "%IDENTITY": 80.96}, {"Genome Name/ Sample Name": "Streptococcus sp. 151470009-6", "GENE": "srtG2", "PRODUCT": "(srtG2) surface protein cell wall anchor sortase_B family [PI-2 (VF0530) - Adherence (VFC0001)] [Streptococcus pneumoniae Taiwan19F-14]", "%IDENTITY": 86.87}, {"Genome Name/ Sample Name": "Streptococcus sp. 151470009-6", "GENE": "psaA", "PRODUCT": "(psaA) manganese ABC transporter manganese-binding adhesion liprotein [PsaA (VF0151) - Nutritional/Metabolic factor (VFC0272)] [Streptococcus pneumoniae TIGR4]", "%IDENTITY": 90.14}],
+  bgcPer:      [5, 8, 8, 3, 1, 1, 3, 8, 1, 8, 8, 8, 8, 8, 5, 8, 3],
+  bgcTypeLabels:["NI-siderophore", "terpene", "betalactone", "redox-cofactor", "T1PKS", "arylpolyene", "butyrolactone", "hydrogen-cyanide", "T3PKS", "NAPAA", "cyclic-lactone-autoinducer", "terpene,T3PKS"],
+  bgcTypeVals: [14, 12, 10, 9, 8, 8, 8, 8, 4, 3, 3, 2],
+  hcBGCs:      [{"strain": "Ralstonia insidiosa 151470044-1", "type": "NI-siderophore", "cluster": "Other", "cat": "0.62", "sim": 0.62}, {"strain": "Ralstonia insidiosa 130770013-1", "type": "NI-siderophore", "cluster": "Other", "cat": "0.62", "sim": 0.62}, {"strain": "Ralstonia insidiosa 142550021-1", "type": "NI-siderophore", "cluster": "Other", "cat": "0.62", "sim": 0.62}, {"strain": "Ralstonia insidiosa 142550027-2", "type": "NI-siderophore", "cluster": "Other", "cat": "0.62", "sim": 0.62}, {"strain": "Ralstonia insidiosa 151470066-2", "type": "NI-siderophore", "cluster": "Other", "cat": "0.62", "sim": 0.62}, {"strain": "Ralstonia insidiosa 151470066-1", "type": "NI-siderophore", "cluster": "Other", "cat": "0.62", "sim": 0.62}, {"strain": "Ralstonia insidiosa 123250053-1", "type": "NI-siderophore", "cluster": "Other", "cat": "0.62", "sim": 0.62}, {"strain": "Ralstonia insidiosa 121560039-2", "type": "NI-siderophore", "cluster": "Other", "cat": "0.62", "sim": 0.62}, {"strain": "Staphylococcus hominis 153480033-6", "type": "NI-siderophore", "cluster": "Other:Non-NRP siderophore", "cat": "0.75", "sim": 0.75}, {"strain": "Rothia mucilaginosa 110740021-2", "type": "NRPS", "cluster": "NRP", "cat": "0.88", "sim": 0.88}, {"strain": "Staphylococcus warneri 121210007-3", "type": "NI-siderophore", "cluster": "Other:Non-NRP siderophore", "cat": "1", "sim": 1.0}, {"strain": "Methylorubrum extorquens 153480035-1", "type": "terpene", "cluster": "Terpene", "cat": "1", "sim": 1.0}, {"strain": "Staphylococcus warneri 140720001-1", "type": "NI-siderophore", "cluster": "Other:Non-NRP siderophore", "cat": "1", "sim": 1.0}],
+  mobPlasm:    [1, 9, 10, 7, 1, 1, 6, 9, 0, 9, 13, 8, 9, 14, 2, 17, 5],
+  mobVirus:    [1, 2, 1, 4, 0, 2, 2, 1, 0, 1, 2, 2, 1, 1, 1, 1, 3],
+  mobFull:     [{"strain": "Kocuria rhizophila 111540051-3", "plasm": 1, "virus": 1, "pAmr": 1, "pConj": 0, "phage": "Caudoviricetes"}, {"strain": "Ralstonia insidiosa 151470044-1", "plasm": 9, "virus": 2, "pAmr": 6, "pConj": 4, "phage": "Caudoviricetes"}, {"strain": "Ralstonia insidiosa 130770013-1", "plasm": 10, "virus": 1, "pAmr": 6, "pConj": 4, "phage": "Caudoviricetes"}, {"strain": "Staphylococcus warneri 121210007-3", "plasm": 7, "virus": 4, "pAmr": 1, "pConj": 1, "phage": "Caudoviricetes"}, {"strain": "Sphingomonas lutea F9_3S_D5_B_2", "plasm": 1, "virus": 0, "pAmr": 0, "pConj": 0, "phage": "\u2013"}, {"strain": "Streptococcus sp. 151470009-6", "plasm": 1, "virus": 2, "pAmr": 0, "pConj": 1, "phage": "Caudoviricetes"}, {"strain": "Staphylococcus hominis 153480033-6", "plasm": 6, "virus": 2, "pAmr": 1, "pConj": 0, "phage": "Caudoviricetes"}, {"strain": "Ralstonia insidiosa 142550021-1", "plasm": 9, "virus": 1, "pAmr": 6, "pConj": 4, "phage": "Caudoviricetes"}, {"strain": "Rothia mucilaginosa 110740021-2", "plasm": 0, "virus": 0, "pAmr": 0, "pConj": 0, "phage": "\u2013"}, {"strain": "Ralstonia insidiosa 142550027-2", "plasm": 9, "virus": 1, "pAmr": 6, "pConj": 4, "phage": "Caudoviricetes"}, {"strain": "Methylorubrum extorquens 153480035-1", "plasm": 13, "virus": 2, "pAmr": 0, "pConj": 0, "phage": "Caudoviricetes"}, {"strain": "Ralstonia insidiosa 151470066-2", "plasm": 8, "virus": 2, "pAmr": 6, "pConj": 4, "phage": "Caudoviricetes"}, {"strain": "Ralstonia insidiosa 151470066-1", "plasm": 9, "virus": 1, "pAmr": 6, "pConj": 4, "phage": "Caudoviricetes"}, {"strain": "Ralstonia insidiosa 123250053-1", "plasm": 14, "virus": 1, "pAmr": 6, "pConj": 5, "phage": "Caudoviricetes"}, {"strain": "Kocuria marina F10_7S_D2_EB4", "plasm": 2, "virus": 1, "pAmr": 1, "pConj": 0, "phage": "Caudoviricetes"}, {"strain": "Ralstonia insidiosa 121560039-2", "plasm": 17, "virus": 1, "pAmr": 9, "pConj": 4, "phage": "Caudoviricetes"}, {"strain": "Staphylococcus warneri 140720001-1", "plasm": 5, "virus": 3, "pAmr": 1, "pConj": 0, "phage": "Caudoviricetes"}],
+  plasmAmrTotal: 56,
+  plasmConjTotal: 35,
+  plasmNoMge: 65
+};
+
+var _p6inited = false;
+
+function initP6(){
+  if(_p6inited) return; _p6inited = true;
+  setTimeout(function(){
+    _renderCogTopBar(); _renderCogHeat(); _renderCogRadar();
+    _renderAmrStackBar(); _renderAmrClassDonut(); _renderBacmetBar();
+    _buildAmrTable(); _buildVfdbTable();
+    _renderBgcBar(); _renderBgcType(); _buildBgcTable();
+    _renderPlasmBar(); _renderVirusBar(); _renderMobBubble(); _renderPlasmStats(); _buildMobTable();
+  }, 80);
+}
+
+function _renderCogTopBar(){
+  var c = document.getElementById('c-cog-bar'); if(!c||c._r)return; c._r=1;
+  new Chart(c,{type:'bar',data:{labels:FN.top10Labels,
+    datasets:[{label:'Gene count',data:FN.top10Vals,
+      backgroundColor:['#1A6E5E','#1A7A6A','#1E8875','#238780','#28968C','#2EA598','#35B4A4','#3DC3B0','#44CCBA','#4CD5C4'],
+      borderRadius:5}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:t=>` ${t.parsed.x.toLocaleString()} genes`}}},
+      scales:{x:{grid:{color:'#f0ede7'},ticks:{font:{size:11}}},y:{ticks:{font:{size:10}}}}}});
+}
+
+function _renderCogHeat(){
+  var c = document.getElementById('c-cog-heat'); if(!c||c._r)return; c._r=1;
+  var palette=['#1A6E5E','#185FA5','#B8650E','#C94E20','#7C3AED','#0891B2','#059669','#DC2626','#D97706','#64748B','#9333EA'];
+  var datasets = FN.heatDatasets.map((d,i)=>{
+    return {label:d.label,data:d.data,backgroundColor:palette[i%palette.length]+'99',borderRadius:2,barThickness:10};
+  });
+  new Chart(c,{type:'bar',data:{labels:FN.shortNames,datasets},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{font:{size:9},padding:5,boxWidth:9}}},
+      scales:{x:{stacked:false,grid:{color:'#f0ede7'}},y:{ticks:{font:{size:9}}}}}});
+}
+
+function _renderCogRadar(){
+  var c = document.getElementById('c-cog-radar'); if(!c||c._r)return; c._r=1;
+  new Chart(c,{type:'radar',data:{labels:FN.radarLabels,
+    datasets:[{label:'Avg gene count',data:FN.radarAvgs,
+      backgroundColor:'rgba(26,110,94,0.18)',borderColor:'#1A6E5E',
+      pointBackgroundColor:'#1A6E5E',pointRadius:4,borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{r:{ticks:{font:{size:9},stepSize:50},pointLabels:{font:{size:10}}}}}});
+}
+
+function _renderAmrStackBar(){
+  var c = document.getElementById('c-amr-bar'); if(!c||c._r)return; c._r=1;
+  var labels = FN.amrTable.map(d=>d.strain
+    .replace('Ralstonia insidiosa','R. insidiosa')
+    .replace('Staphylococcus warneri','S. warneri')
+    .replace('Staphylococcus hominis','S. hominis')
+    .replace('Methylorubrum extorquens','M. extorquens')
+    .replace('Sphingomonas lutea','S. lutea')
+    .replace('Streptococcus sp.','Strep. sp.')
+    .replace('Rothia mucilaginosa','R. mucilaginosa')
+    .replace('Kocuria rhizophila','K. rhizophila')
+    .replace('Kocuria marina','K. marina'));
+  new Chart(c,{type:'bar',data:{labels,
+    datasets:[
+      {label:'NCBI AMR',data:FN.amrTable.map(d=>d.ncbi),backgroundColor:'#C94E20cc',borderRadius:3},
+      {label:'CARD',    data:FN.amrTable.map(d=>d.card), backgroundColor:'#185FA5cc',borderRadius:3},
+      {label:'VFDB',   data:FN.amrTable.map(d=>d.vfdb), backgroundColor:'#B8650Ecc',borderRadius:3},
+      {label:'BacMet (÷4)',data:FN.amrTable.map(d=>Math.round(d.bacmet/4)),backgroundColor:'#1A6E5Ecc',borderRadius:3},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{font:{size:10},padding:8}},
+        tooltip:{callbacks:{label:t=>t.dataset.label==='BacMet (÷4)'?`BacMet: ${t.parsed.y*4} hits (displayed ÷4)`:`${t.dataset.label}: ${t.parsed.y}`}}},
+      scales:{x:{ticks:{font:{size:8},maxRotation:45}},y:{beginAtZero:true,title:{display:true,text:'Gene hits'}}}}});
+}
+
+function _renderAmrClassDonut(){
+  var c = document.getElementById('c-amr-class'); if(!c||c._r)return; c._r=1;
+  var pal=['#C94E20','#185FA5','#B8650E','#1A6E5E','#7C3AED','#0891B2','#DC2626','#059669'];
+  new Chart(c,{type:'doughnut',data:{labels:FN.cardClLabels,
+    datasets:[{data:FN.cardClVals,backgroundColor:pal,borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'right',labels:{font:{size:10},padding:8}}}}});
+}
+
+function _renderBacmetBar(){
+  var c = document.getElementById('c-bacmet'); if(!c||c._r)return; c._r=1;
+  var colors = FN.bacLabels.map(g=>g.startsWith('mer')?'#185FA5bb':g.startsWith('chr')||g.startsWith('cnr')||g.startsWith('czc')?'#C94E20bb':'#1A6E5Ebb');
+  new Chart(c,{type:'bar',data:{labels:FN.bacLabels,
+    datasets:[{label:'Strain count',data:FN.bacVals,backgroundColor:colors,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:t=>`${t.parsed.y} strains carry this gene`}}},
+      scales:{x:{ticks:{font:{size:9}}},y:{beginAtZero:true,ticks:{stepSize:2}}}}});
+}
+
+function _buildAmrTable(){
+  var tb = document.getElementById('amr-tb'); if(!tb||tb._d)return; tb._d=1;
+  FN.amrTable.forEach(d=>{
+    var total = d.ncbi+d.card+d.vfdb;
+    var badge = total>0
+      ?`<span style="background:#C94E2022;color:#C94E20;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600">${total} hit${total>1?'s':''}</span>`
+      :'<span style="color:#bbb">clean</span>';
+    var tr = document.createElement('tr');
+    tr.innerHTML = `<td style="font-size:11px"><em>${d.strain}</em></td><td>${d.ncbi||'–'}</td><td>${d.card||'–'}</td><td>${d.vfdb||'–'}</td><td>${d.bacmet||'–'}</td><td>${badge}</td><td style="font-size:10px;max-width:150px;word-break:break-word">${d.genes}</td><td style="font-size:10px;max-width:150px;word-break:break-word">${d.classes}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function _buildVfdbTable(){
+  var tb = document.getElementById('vfdb-tb'); if(!tb||tb._d)return; tb._d=1;
+  FN.vfdbRows.forEach(d=>{
+    var pid = parseFloat(d['%IDENTITY'])||0;
+    var col = pid>=90?'#0F8A63':pid>=80?'#185FA5':'#B8650E';
+    var tr = document.createElement('tr');
+    tr.innerHTML = `<td style="font-size:11px"><em>${d['Genome Name/ Sample Name']}</em></td><td><strong>${d.GENE}</strong></td><td style="font-size:10px;max-width:240px">${d.PRODUCT}</td><td><span style="color:${col};font-weight:600">${pid.toFixed(1)}%</span></td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function _renderBgcBar(){
+  var c = document.getElementById('c-bgc-bar'); if(!c||c._r)return; c._r=1;
+  var colors = FN.strainNames.map(s=>s.includes('Ralstonia')?'#3C3489cc':s.includes('Methylorubrum')?'#0F8A63cc':s.includes('Kocuria')?'#185FA5cc':s.includes('Staphylococcus')?'#C94E20cc':'#B8650Ecc');
+  new Chart(c,{type:'bar',data:{labels:FN.shortNames,
+    datasets:[{label:'BGC count',data:FN.bgcPer,backgroundColor:colors,borderRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:t=>`${t.parsed.y} BGC${t.parsed.y!==1?'s':''}`}}},
+      scales:{x:{ticks:{font:{size:9},maxRotation:45}},y:{beginAtZero:true,ticks:{stepSize:2}}}}});
+}
+
+function _renderBgcType(){
+  var c = document.getElementById('c-bgc-type'); if(!c||c._r)return; c._r=1;
+  var pal=['#1A6E5E','#185FA5','#B8650E','#C94E20','#0F8A63','#3C3489','#7C3AED','#0891B2','#DC2626','#059669','#D97706','#6D28D9'];
+  new Chart(c,{type:'polarArea',data:{labels:FN.bgcTypeLabels,
+    datasets:[{data:FN.bgcTypeVals,backgroundColor:pal.map(p=>p+'99'),borderColor:pal,borderWidth:1.5}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'right',labels:{font:{size:9},padding:5,boxWidth:10}}}}});
+}
+
+function _buildBgcTable(){
+  var tb = document.getElementById('bgc-hc-tb'); if(!tb||tb._d)return; tb._d=1;
+  FN.hcBGCs.forEach(d=>{
+    var sim = parseFloat(d.sim)||0;
+    var col = sim>=0.9?'#0F8A63':sim>=0.7?'#185FA5':'#B8650E';
+    var pct = (sim*100).toFixed(0)+'%';
+    var tr = document.createElement('tr');
+    tr.innerHTML = `<td style="font-size:10px"><em>${d.strain}</em></td><td><strong>${d.type}</strong></td><td style="font-size:10px">${d.cluster}</td><td style="font-size:10px">${d.cat}</td><td><span style="background:${col}22;color:${col};padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">${pct}</span></td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function _renderPlasmBar(){
+  var c = document.getElementById('c-plasm-bar'); if(!c||c._r)return; c._r=1;
+  var colors = FN.mobPlasm.map(v=>v>=14?'#C94E20cc':v>=8?'#B8650Ecc':v>=4?'#1A6E5Ecc':'#3A8D80cc');
+  new Chart(c,{type:'bar',data:{labels:FN.shortNames,
+    datasets:[{label:'Plasmid sequences',data:FN.mobPlasm,backgroundColor:colors,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{x:{ticks:{font:{size:8},maxRotation:45}},y:{beginAtZero:true}}}});
+}
+
+function _renderVirusBar(){
+  var c = document.getElementById('c-virus-bar'); if(!c||c._r)return; c._r=1;
+  var colors = FN.mobVirus.map(v=>v>=4?'#3C3489cc':v>=2?'#185FA5cc':v>0?'#4A9D90cc':'#e0ddd8');
+  new Chart(c,{type:'bar',data:{labels:FN.shortNames,
+    datasets:[{label:'Viral/prophage sequences',data:FN.mobVirus,backgroundColor:colors,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{x:{ticks:{font:{size:8},maxRotation:45}},y:{beginAtZero:true,ticks:{stepSize:1}}}}});
+}
+
+function _renderPlasmStats(){
+  var c = document.getElementById('c-plasm-amr'); if(!c||c._r)return; c._r=1;
+  new Chart(c,{type:'doughnut',data:{
+    labels:['w/ AMR genes ('+FN.plasmAmrTotal+')','w/ Conjugation ('+FN.plasmConjTotal+')','No MGE markers ('+FN.plasmNoMge+')'],
+    datasets:[{data:[FN.plasmAmrTotal,FN.plasmConjTotal,FN.plasmNoMge],
+      backgroundColor:['#C94E20bb','#B8650Ebb','#1A6E5Ebb'],borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}}}});
+}
+
+function _renderMobBubble(){
+  var c = document.getElementById('c-mob-bubble'); if(!c||c._r)return; c._r=1;
+  var bdata = FN.mobFull.map(d=>({x:d.plasm,y:d.virus,r:Math.max(5,Math.sqrt(d.plasm+1)*4),label:d.strain}));
+  var bcols = FN.mobFull.map(d=>
+    d.strain.includes('Ralstonia')?'#3C3489bb':
+    d.strain.includes('Staphylococcus')?'#C94E20bb':
+    d.strain.includes('Methylorubrum')?'#0F8A63bb':'#185FA5bb');
+  new Chart(c,{type:'bubble',data:{datasets:[{label:'Strains',data:bdata,backgroundColor:bcols,borderColor:bcols.map(x=>x.replace('bb','dd')),borderWidth:1}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:t=>`${t.raw.label}: ${t.raw.x} plasmids, ${t.raw.y} viruses`}}},
+      scales:{x:{beginAtZero:true,title:{display:true,text:'Plasmid sequences',font:{size:10}}},y:{beginAtZero:true,title:{display:true,text:'Viral sequences',font:{size:10}}}}}});
+}
+
+function _buildMobTable(){
+  var tb = document.getElementById('mob-tb'); if(!tb||tb._d)return; tb._d=1;
+  FN.mobFull.forEach(d=>{
+    var amrB = d.pAmr>0?`<span style="background:#C94E2022;color:#C94E20;padding:2px 6px;border-radius:8px;font-size:10px">${d.pAmr}</span>`:'–';
+    var cjB  = d.pConj>0?`<span style="background:#185FA522;color:#185FA5;padding:2px 6px;border-radius:8px;font-size:10px">${d.pConj}</span>`:'–';
+    var tr = document.createElement('tr');
+    tr.innerHTML = `<td style="font-size:11px"><em>${d.strain}</em></td><td>${d.plasm||'–'}</td><td>${d.virus||'–'}</td><td>${amrB}</td><td>${cjB}</td><td style="font-size:10px;color:#888">${d.phage}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
 </script>
 </body>
 </html>
