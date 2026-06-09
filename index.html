@@ -371,7 +371,7 @@ canvas{display:block;width:100%!important;max-width:100%}
     <div class="ns">Quality</div>
     <div class="ni" onclick="go('p5',this)"><div class="nd" style="background:var(--bsl1)"></div>Genome QC<span class="nb">QC</span></div>
   </nav>
-  <div class="sf">Pre-MT: 282 strains<br>MT-3: 268 strains<br>Study dataset: 550<br>HQ tree: 809 genomes<br>Novel genera: 6</div>
+  <div class="sf">Pre-MT: 282 strains<br>MT-3: 268 strains<br>Current Study (Pre-MT, MT-3): 550<br>HQ tree: 809 genomes<br>Novel genera: 6</div>
 </aside>
 
 <!-- MAIN -->
@@ -382,12 +382,12 @@ canvas{display:block;width:100%!important;max-width:100%}
   <div class="ph">
     <div class="pe">Section 1 · Dataset</div>
     <div class="pt">Dataset Overview &amp; Study Scope</div>
-    <div class="pd">867 ISS bacterial isolates across 4 mission phases. Primary study dataset: Pre-MT + MT-3 (n=550). MT-1 and MT-2 retained for comparative context.</div>
+    <div class="pd">867 ISS bacterial isolates across 4 mission phases. Primary Current Study (Pre-MT, MT-3): Pre-MT + MT-3 (n=550). MT-1 and MT-2 retained for comparative context.</div>
   </div>
 
   <div class="krow">
     <div class="kpi" style="--c:var(--premt)"><div class="kn">867</div><div class="kl">Total ISS Genomes</div><div class="ks">All 4 mission phases</div></div>
-    <div class="kpi" style="--c:var(--mt3)"><div class="kn">550</div><div class="kl">Primary Study Dataset</div><div class="ks">Pre-MT + MT-3 combined</div></div>
+    <div class="kpi" style="--c:var(--mt3)"><div class="kn">550</div><div class="kl">Primary Current Study (Pre-MT, MT-3)</div><div class="ks">Pre-MT + MT-3 combined</div></div>
     <div class="kpi" style="--c:var(--novel)"><div class="kn">16</div><div class="kl">Novel Species</div><div class="ks">Across 6 genera</div></div>
     <div class="kpi" style="--c:#888"><div class="kn">58</div><div class="kl">Failed QC</div><div class="ks">Low completeness / contamination</div></div>
   </div>
@@ -423,22 +423,22 @@ canvas{display:block;width:100%!important;max-width:100%}
         <tr>
           <td><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--premt);margin-right:8px;vertical-align:middle"></span><strong>Pre-MT</strong></td>
           <td><strong>282</strong></td><td>43</td><td>2.633</td><td>0.700</td>
-          <td><span class="pill" style="background:#EEF2FF;color:#3730A3">Study dataset</span></td>
+          <td><span class="pill" style="background:#EEF2FF;color:#3730A3">Current Study (Pre-MT, MT-3)</span></td>
         </tr>
         <tr>
           <td><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--mt1);margin-right:8px;vertical-align:middle"></span><strong>MT-1</strong></td>
           <td><strong>231</strong></td><td>30</td><td>2.888</td><td>0.849</td>
-          <td><span class="pill" style="background:var(--faint);color:var(--muted)">Reference</span></td>
+          <td><span class="pill" style="background:var(--faint);color:var(--muted)">Previous Study ( MT-1, MT-2)</span></td>
         </tr>
         <tr>
           <td><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--mt2);margin-right:8px;vertical-align:middle"></span><strong>MT-2</strong></td>
           <td><strong>86</strong></td><td>11</td><td>1.608</td><td>0.671</td>
-          <td><span class="pill" style="background:var(--faint);color:var(--muted)">Reference</span></td>
+          <td><span class="pill" style="background:var(--faint);color:var(--muted)">Previous Study ( MT-1, MT-2)</span></td>
         </tr>
         <tr>
           <td><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--mt3);margin-right:8px;vertical-align:middle"></span><strong>MT-3</strong></td>
           <td><strong>268</strong></td><td>25</td><td>2.315</td><td>0.719</td>
-          <td><span class="pill" style="background:#EEF2FF;color:#3730A3">Study dataset</span></td>
+          <td><span class="pill" style="background:#EEF2FF;color:#3730A3">Current Study (Pre-MT, MT-3)</span></td>
         </tr>
         <tr style="font-weight:700;font-size:13px">
           <td>Total (all phases)</td><td><strong>867</strong></td><td>—</td><td>—</td><td>—</td><td>—</td>
@@ -775,8 +775,8 @@ canvas{display:block;width:100%!important;max-width:100%}
 
   <div class="ph">
     <div class="pe">Phylogeny · Whole-Genome Tree</div>
-    <div class="pt">Phylogenetic Tree of ISS &amp; Reference Genomes</div>
-    <div class="pd">Maximum-likelihood tree of 809 high-quality genomes spanning all four mission phases plus previous-study references. Rings encode phylum, class, and genus; the inner band marks current-study (ISS) vs reference strains. Use the controls to zoom, pan, and toggle the legend, info, and QC panels.</div>
+    <div class="pt">Phylogenetic Tree of ISS &amp; Previous Study ( MT-1, MT-2) Genomes</div>
+    <div class="pd">Maximum-likelihood tree of 809 high-quality genomes spanning all four mission phases plus previous-study Previous Study ( MT-1, MT-2)s. Rings encode phylum, class, and genus; the inner band marks current-study (ISS) vs Previous Study ( MT-1, MT-2) strains. Use the controls to zoom, pan, and toggle the legend, info, and QC panels.</div>
   </div>
 
   <!-- KPI bar across top -->
@@ -823,7 +823,7 @@ canvas{display:block;width:100%!important;max-width:100%}
         <div class="tp-title">Legend</div>
 
         <div class="tp-section">Strain Type</div>
-        <div class="tp-row"><div class="tp-dot" style="background:#e5e8e8;border:1.5px solid #aaa"></div><span>Previous Study / Reference</span></div>
+        <div class="tp-row"><div class="tp-dot" style="background:#e5e8e8;border:1.5px solid #aaa"></div><span>Previous Study / Previous Study ( MT-1, MT-2)</span></div>
         <div class="tp-row"><div class="tp-dot" style="background:#87ceeb;border:1.5px solid #4a90c0"></div><span>Current Study (ISS)</span></div>
 
         <div class="tp-section" style="margin-top:10px">Phylum</div>
@@ -1288,7 +1288,7 @@ var evPlugin={id:"refLine",afterDraw(chart){
   ctx.strokeStyle="rgba(185,100,14,0.65)";ctx.lineWidth=1.8;
   ctx.moveTo(left,yPx);ctx.lineTo(right,yPx);ctx.stroke();
   ctx.font="11px DM Mono";ctx.fillStyle="#B8650E";
-  ctx.fillText("J'=0.75 reference",left+6,yPx-6);
+  ctx.fillText("J'=0.75 Previous Study ( MT-1, MT-2)",left+6,yPx-6);
   ctx.restore();
 }};
 
